@@ -189,6 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $stmt->execute([$birthdate, $_SESSION['user_id']]);
                             
                             $_SESSION['age_verified_at'] = date('Y-m-d H:i:s');
+                            // Bust the lockdown cache so init.php re-reads the DB on the next
+                            // page load. Without this, the stale _lockdown_cached_user entry
+                            // (which still has age_verified_at = NULL) would cause init.php to
+                            // redirect back here immediately, creating an infinite loop.
+                            unset($_SESSION['_lockdown_cached_user'], $_SESSION['_lockdown_check_at']);
                             $success = true;
                         }
                     }

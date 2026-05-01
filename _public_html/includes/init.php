@@ -255,6 +255,11 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
                     $_SESSION['_force_logout_last_check'] = time(); // Update force logout check too
                     $_SESSION['_lockdown_check_at'] = time();
                     $_SESSION['_lockdown_cached_user'] = $user;
+                    // Sync age_verified_at from DB into session so the escape hatch below
+                    // works immediately without waiting for the cache TTL to expire.
+                    if (!empty($user['age_verified_at']) && empty($_SESSION['age_verified_at'])) {
+                        $_SESSION['age_verified_at'] = $user['age_verified_at'];
+                    }
                 }
             }
         }
@@ -313,7 +318,13 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
                     $_SESSION['account_tier'] = $user['account_tier'];
 
                     // --- One-time age reverification for existing Paid users ---
-                    if (empty($user['age_verified_at']) && $user['account_status'] === 'active') {
+                    // Check the session value FIRST — it is set by verify_age_existing.php on
+                    // successful submission. If we only check $user['age_verified_at'] we hit a
+                    // race condition: the _lockdown_cached_user cache entry may still hold a
+                    // stale NULL even though the DB has already been updated, causing an
+                    // infinite redirect loop between /main.php and /auth/verify_age_existing.php.
+                    $__ageVerified = !empty($_SESSION['age_verified_at']) || !empty($user['age_verified_at']);
+                    if (!$__ageVerified && $user['account_status'] === 'active') {
                         $_verifPath = $_SERVER['REQUEST_URI'] ?? '';
                         $_verifAllowed = ['verify_age_existing.php', 'logout.php'];
                         $_verifNeeded = true;
