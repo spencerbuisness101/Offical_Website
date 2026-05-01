@@ -22,6 +22,6 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./_public_html/
-        # Adjust server-dir if your Hostinger FTP account drops you in a higher directory
-        # Typical shared hosting maps FTP directly to public_html, but sometimes you need:
-        server-dir: ./public_html/
+        server-dir: ./
+        dangerous-clean-slate: true
+        log-level: verbose
