@@ -2038,3 +2038,285 @@
     font-display: swap;
     src: local('Font Awesome 5 Brands');
 }
+
+/* ==========================================================================
+   PREMIUM GLASSMORPHIC LOGIN UI (v7.1 Updates)
+   ========================================================================== */
+.glassmorphism-premium {
+    background: rgba(10, 10, 20, 0.6) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    padding: 40px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.glassmorphism-premium::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(123, 110, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.login-brand {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.icon-glow-wrap {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(123, 110, 246, 0.2), rgba(94, 78, 243, 0.05));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    border: 1px solid rgba(123, 110, 246, 0.3);
+    box-shadow: 0 0 20px rgba(123, 110, 246, 0.2);
+}
+
+.login-brand-icon {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #fff 0%, #7b6ef6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 5px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.premium-input {
+    width: 100%;
+    padding: 14px 15px 14px 45px;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.premium-input:focus {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(123, 110, 246, 0.5) !important;
+    box-shadow: 0 0 0 4px rgba(123, 110, 246, 0.1);
+    outline: none;
+}
+
+.premium-input:focus + .input-icon,
+.premium-input:not(:placeholder-shown) + .input-icon {
+    color: #7b6ef6;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 15px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.password-toggle-btn:hover {
+    color: #fff;
+}
+
+.form-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
+}
+
+.premium-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    user-select: none;
+}
+
+.premium-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    height: 18px;
+    width: 18px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.premium-checkbox:hover input ~ .checkmark {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.premium-checkbox input:checked ~ .checkmark {
+    background-color: #7b6ef6;
+    border-color: #7b6ef6;
+}
+
+.checkmark:after {
+    content: "";
+    display: none;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.premium-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.forgot-link, .highlight-link {
+    color: #7b6ef6;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.forgot-link:hover, .highlight-link:hover {
+    color: #9d93f8;
+    text-shadow: 0 0 8px rgba(123, 110, 246, 0.4);
+}
+
+.btn-premium-submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7b6ef6 0%, #5e4ef3 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(123, 110, 246, 0.3);
+}
+
+.btn-premium-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-premium-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(123, 110, 246, 0.5);
+}
+
+.btn-premium-submit:hover::before {
+    left: 100%;
+}
+
+.btn-premium-submit:active {
+    transform: translateY(0);
+}
+
+.login-footer-links {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    position: relative;
+    z-index: 1;
+}
+
+.input-error-msg {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: none;
+}
+.input-error-msg.visible {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.alert-banner {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    display: none;
+}
+.alert-banner.visible {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+.error-banner {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

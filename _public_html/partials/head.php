@@ -1,7 +1,7 @@
-<head>
+﻿<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spencer's Website � Your Digital Universe</title>
+    <title>Spencer's Website — Your Digital Universe</title>
     <meta name="description" content="Games, AI chat, and a thriving community.">
     
     <link rel="icon" href="/assets/images/favicon.webp" type="image/webp">
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="css/tokens<?php echo $assetExt; ?>.css?v=<?php echo $siteVersion; ?>">
     <link rel="stylesheet" href="css/index<?php echo $assetExt; ?>.css?v=<?php echo $siteVersion; ?>">
     <link rel="stylesheet" href="css/cinematic-bg<?php echo $assetExt; ?>.css?v=<?php echo $siteVersion; ?>">
-    <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Premium UI Enhancements -->
     <style>
@@ -58,3 +58,4 @@
     <script src="https://www.google.com/recaptcha/api.js?render=<?php echo htmlspecialchars($recaptchaSiteKey); ?>" async defer></script>
     <?php endif; ?>
 </head>
+
