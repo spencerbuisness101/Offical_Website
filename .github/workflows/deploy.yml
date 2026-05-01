@@ -22,6 +22,6 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./_public_html/
-        server-dir: ./
+        server-dir: public_html/
         dangerous-clean-slate: true
         log-level: verbose
