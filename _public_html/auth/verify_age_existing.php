@@ -6,8 +6,11 @@
  * Users who declare themselves under 13 will be immediately downgraded to Community Accounts.
  */
 
-session_start();
-define('APP_RUNNING', true);
+if (!defined('APP_RUNNING')) {
+    define('APP_RUNNING', true);
+}
+require_once __DIR__ . '/../includes/init.php';
+
 
 // Check if user is logged in (existing user)
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user_id'])) {
