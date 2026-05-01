@@ -318,26 +318,19 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
                     $_SESSION['account_tier'] = $user['account_tier'];
 
                     // --- One-time age reverification for existing Paid users ---
-                    // Check the session value FIRST — it is set by verify_age_existing.php on
-                    // successful submission. If we only check $user['age_verified_at'] we hit a
-                    // race condition: the _lockdown_cached_user cache entry may still hold a
-                    // stale NULL even though the DB has already been updated, causing an
-                    // infinite redirect loop between /main.php and /auth/verify_age_existing.php.
+                    // NOTE: Hard redirect to /auth/verify_age_existing.php has been DISABLED
+                    // because it caused ERR_TOO_MANY_REDIRECTS in the Hostinger/LiteSpeed
+                    // environment (session cookie params, output caching, and relative-path
+                    // redirects all conspired to create an infinite loop).
+                    //
+                    // Instead, we set a session flag so individual pages can show a soft
+                    // prompt / banner directing the user to verify their age voluntarily.
+                    // The verify_age_existing.php page remains fully functional.
                     $__ageVerified = !empty($_SESSION['age_verified_at']) || !empty($user['age_verified_at']);
                     if (!$__ageVerified && $user['account_status'] === 'active') {
-                        $_verifPath = $_SERVER['REQUEST_URI'] ?? '';
-                        $_verifAllowed = ['verify_age_existing.php', 'logout.php'];
-                        $_verifNeeded = true;
-                        foreach ($_verifAllowed as $_va) {
-                            if (str_contains($_verifPath, $_va)) {
-                                $_verifNeeded = false;
-                                break;
-                            }
-                        }
-                        if ($_verifNeeded && !headers_sent()) {
-                            header('Location: /auth/verify_age_existing.php');
-                            exit;
-                        }
+                        $_SESSION['_age_verification_needed'] = true;
+                    } else {
+                        unset($_SESSION['_age_verification_needed']);
                     }
                     
                     // Auto-restore accounts in pending_deletion grace period if user logs back in
