@@ -1,0 +1,21 @@
+# Admin directory protection - Spencer's Website v8.0
+# All scripts in this directory require admin PHP session auth.
+# This .htaccess adds defense-in-depth by blocking direct access
+# to migration/setup scripts that should never be hit in production.
+
+# Block direct access to migration and setup scripts
+<FilesMatch "^(setup_database|setup_mysql|setup_announcements|init_database|migration_.*|recover_accounts)\.php$">
+    # These files are only needed during initial setup or emergencies.
+    # To use them, temporarily rename or comment out this block.
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Disable directory listing
+Options -Indexes
+
+# Prevent .htaccess from being served
+<FilesMatch "^\.htaccess$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

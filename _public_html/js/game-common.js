@@ -1,0 +1,260 @@
+/**
+ * Game Common JavaScript
+ *
+ * Shared functionality for all game pages including:
+ * - Game tracking
+ * - Settings management
+ * - Background selection
+ * - Modal handling
+ * - Fullscreen support
+ */
+
+const GameCommon = (function() {
+    'use strict';
+
+    // Private state
+    let config = {
+        gameName: 'unknown',
+        iframeId: 'gameFrame',
+        userId: null,
+        username: ''
+    };
+
+    let gameStartTime = null;
+    let isPlaying = false;
+
+    /**
+     * Initialize game common functionality
+     * @param {Object} options - Configuration options
+     */
+    function init(options) {
+        Object.assign(config, options);
+
+        // Load saved settings
+        loadSettings();
+
+        // Setup event listeners
+        setupEventListeners();
+
+        // Track page view
+        trackEvent('view');
+
+        console.log(`GameCommon initialized for: ${config.gameName}`);
+    }
+
+    /**
+     * Setup event listeners
+     */
+    function setupEventListeners() {
+        // Track when user starts playing (focus on iframe)
+        const iframe = document.getElementById(config.iframeId);
+        if (iframe) {
+            iframe.addEventListener('load', function() {
+                trackEvent('load');
+            });
+
+            // Detect focus on iframe (game started)
+            window.addEventListener('blur', function() {
+                if (document.activeElement === iframe && !isPlaying) {
+                    startPlaying();
+                }
+            });
+        }
+
+        // Track when leaving page
+        window.addEventListener('beforeunload', function() {
+            if (isPlaying) {
+                stopPlaying();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F11 or F for fullscreen
+            if (e.key === 'F11' || (e.key === 'f' && !e.ctrlKey && !e.metaKey)) {
+                if (document.activeElement !== iframe) {
+                    e.preventDefault();
+                    toggleFullscreen();
+                }
+            }
+
+            // Escape closes modals
+            if (e.key === 'Escape') {
+                closeAllModals();
+            }
+        });
+    }
+
+    /**
+     * Track game started
+     */
+    function startPlaying() {
+        isPlaying = true;
+        gameStartTime = Date.now();
+        trackEvent('start');
+    }
+
+    /**
+     * Track game stopped
+     */
+    function stopPlaying() {
+        if (isPlaying && gameStartTime) {
+            const playTime = Math.round((Date.now() - gameStartTime) / 1000);
+            trackEvent('stop', { playTime: playTime });
+        }
+        isPlaying = false;
+        gameStartTime = null;
+    }
+
+    /**
+     * Track game event
+     * @param {string} action - Event type (view, start, stop, etc.)
+     * @param {Object} data - Additional data
+     */
+    function trackEvent(action, data = {}) {
+        const payload = {
+            game: config.gameName,
+            action: action,
+            session_id: getSessionId(),
+            ...data
+        };
+
+        // Use tracking API if available
+        if (typeof fetch !== 'undefined') {
+            fetch('api/track_game.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            }).catch(function(err) {
+                console.log('Tracking error:', err);
+            });
+        }
+    }
+
+    /**
+     * Get or create session ID
+     * @returns {string} Session ID
+     */
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('gameSessionId');
+        if (!sessionId) {
+            sessionId = 'gs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('gameSessionId', sessionId);
+        }
+        return sessionId;
+    }
+
+    /**
+     * Load saved settings
+     */
+    function loadSettings() {
+        // Volume
+        const volume = localStorage.getItem('gameVolume');
+        if (volume !== null) {
+            const volumeSlider = document.getElementById('volumeSlider');
+            if (volumeSlider) {
+                volumeSlider.value = volume;
+            }
+        }
+
+        // Auto fullscreen preference
+        const autoFullscreen = localStorage.getItem('autoFullscreen');
+        if (autoFullscreen !== null) {
+            const checkbox = document.getElementById('fullscreenOnPlay');
+            if (checkbox) {
+                checkbox.checked = autoFullscreen === 'true';
+            }
+        }
+
+        // Saved background
+        const savedBg = localStorage.getItem('selectedBackground');
+        if (savedBg) {
+            applyBackground(savedBg);
+        }
+    }
+
+    /**
+     * Save a setting
+     * @param {string} key - Setting key
+     * @param {*} value - Setting value
+     */
+    function saveSetting(key, value) {
+        localStorage.setItem(key, value);
+
+        // Track setting change
+        if (typeof fetch !== 'undefined') {
+            fetch('api/track_setting.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    setting: key,
+                    value: value,
+                    session_id: getSessionId()
+                })
+            }).catch(function(err) {
+                console.log('Setting tracking error:', err);
+            });
+        }
+    }
+
+    /**
+     * Toggle fullscreen mode
+     */
+    function toggleFullscreen() {
+        const iframe = document.getElementById(config.iframeId);
+        if (!iframe) return;
+
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            iframe.requestFullscreen().catch(function(err) {
+                console.log('Fullscreen error:', err);
+            });
+        }
+    }
+
+    /**
+     * Apply background
+     * @param {string} url - Background image URL
+     */
+    function applyBackground(url) {
+        document.body.style.backgroundImage = `url('${url}')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundAttachment = 'fixed';
+    }
+
+    /**
+     * Close all modals
+     */
+    function closeAllModals() {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(function(modal) {
+            modal.style.display = 'none';
+        });
+    }
+
+    // Public API
+    return {
+        init: init,
+        trackEvent: trackEvent,
+        saveSetting: saveSetting,
+        toggleFullscreen: toggleFullscreen,
+        applyBackground: applyBackground,
+        closeAllModals: closeAllModals,
+        getSessionId: getSessionId
+    };
+})();
+
+// Global helper functions for inline event handlers
+function toggleFullscreen() {
+    GameCommon.toggleFullscreen();
+}
+
+function loadGameSettings() {
+    // Settings are loaded automatically in GameCommon.init()
+}

@@ -1,0 +1,28 @@
+# IDE and System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.tmp
+*.swp
+
+# Environment and Secrets
+.env
+config/secrets.php
+*_secret.php
+
+# PHP and Web specific
+_public_html/logs/
+_public_html/cache/
+_public_html/api/error_log
+_public_html/.env
+_public_html/build_output.txt
+
+# Vendor and Dependencies
+vendor/
+node_modules/
+
+# Agent stuff (unless you want to track our rules)
+.agents/rules/

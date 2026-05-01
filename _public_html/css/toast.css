@@ -1,0 +1,132 @@
+/**
+ * Toast Notification System — Spencer's Website v7.0
+ * Glassmorphism toasts with design-token compliance.
+ */
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 360px;
+    width: 100%;
+}
+
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+    color: var(--text);
+    font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+    font-size: 14px;
+    line-height: 1.4;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.hiding {
+    transform: translateX(120%);
+    opacity: 0;
+}
+
+/* Type accents */
+.toast--success { border-color: rgba(34, 197, 94, 0.35); }
+.toast--success .toast__icon { color: var(--success); }
+
+.toast--error   { border-color: rgba(239, 68, 68, 0.35); }
+.toast--error   .toast__icon { color: var(--danger); }
+
+.toast--warning { border-color: rgba(251, 191, 36, 0.35); }
+.toast--warning .toast__icon { color: var(--warning); }
+
+.toast--info    { border-color: var(--border-violet); }
+.toast--info    .toast__icon { color: var(--accent); }
+
+.toast__icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.toast__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast__message {
+    word-wrap: break-word;
+}
+
+.toast__close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px;
+    line-height: 1;
+    opacity: 0.6;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+}
+
+.toast__close:hover { opacity: 1; color: var(--text); }
+
+/* Progress bar */
+.toast__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 0 0 0 14px;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    opacity: 0.6;
+    transition: width 0.1s linear;
+}
+
+.toast--success .toast__progress { background: var(--success); opacity: 0.5; }
+.toast--error   .toast__progress { background: var(--danger);  opacity: 0.5; }
+.toast--warning .toast__progress { background: var(--warning); opacity: 0.5; }
+
+/* Mobile */
+@media (max-width: 480px) {
+    .toast-container {
+        top: auto;
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        max-width: none;
+    }
+    .toast {
+        transform: translateY(120%);
+    }
+    .toast.show { transform: translateY(0); }
+    .toast.hiding { transform: translateY(120%); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .toast {
+        transition: none;
+    }
+}

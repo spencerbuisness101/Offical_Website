@@ -1,0 +1,135 @@
+/* ============================================================================
+ * cinematic-bg.css  (v7.1)
+ * Cinematic background system: black hole + starfield + cursor hue + click ripple.
+ * Layout layers (back→front, all fixed):
+ *     0. body bg (deep space gradient)
+ *     1. #cinematicCanvas       (WebGL — black hole + accretion + parallax stars)
+ *     2. #cinematicCursor       (radial color hue follows pointer)
+ *     3. #cinematicClickLayer   (one-shot ripple/spark bursts)
+ *     4. site content (z-index ≥ 1)
+ * Honours prefers-reduced-motion: dims and freezes everything.
+ * ========================================================================= */
+
+:root {
+    --cb-hue-1: #7B6EF6;
+    --cb-hue-2: #1DFFC4;
+    --cb-hue-3: #A855F7;
+    --cb-hue-4: #EC4899;
+}
+
+/* The whole page sits above the bg layers */
+body { position: relative; }
+
+.cb-root {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    /* Promote to its own GPU layer so it never repaints during scroll */
+    transform: translateZ(0);
+    will-change: transform;
+    contain: strict;
+}
+
+/* WebGL / Canvas 2D fallback both target this id */
+#cinematicCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* Solid black behind canvas to prevent flashes if shader fails first frame */
+    background: radial-gradient(ellipse at center, #08081A 0%, #04040A 60%, #000 100%);
+}
+
+/* Cursor hue: a soft additive radial that lerps to mouse */
+#cinematicCursor {
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate3d(-50%, -50%, 0);
+    background: radial-gradient(
+        circle,
+        color-mix(in oklab, var(--cb-hue-1) 32%, transparent) 0%,
+        color-mix(in oklab, var(--cb-hue-3) 14%, transparent) 35%,
+        transparent 70%
+    );
+    mix-blend-mode: screen;
+    filter: blur(40px);
+    opacity: 0;
+    transition: opacity .25s ease;
+    will-change: transform, opacity;
+}
+.cb-cursor-active #cinematicCursor { opacity: 0.7; }
+
+/* Click bursts: a layer that hosts ephemeral .cb-burst children */
+#cinematicClickLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.cb-burst {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    background: radial-gradient(
+        circle,
+        var(--cb-hue-2) 0%,
+        color-mix(in oklab, var(--cb-hue-2) 60%, transparent) 30%,
+        transparent 70%
+    );
+    box-shadow: 0 0 18px var(--cb-hue-2);
+    mix-blend-mode: screen;
+    opacity: 0;
+    animation: cb-burst-anim 720ms cubic-bezier(.16,.84,.32,1) forwards;
+}
+@keyframes cb-burst-anim {
+    0%   { opacity: 1;   transform: translate3d(-50%, -50%, 0) scale(0.4); }
+    60%  { opacity: 0.8; transform: translate3d(-50%, -50%, 0) scale(8);   }
+    100% { opacity: 0;   transform: translate3d(-50%, -50%, 0) scale(14);  }
+}
+
+/* Star spark sub-particle around the click point */
+.cb-spark {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 6px #fff, 0 0 12px var(--cb-hue-2);
+    transform: translate3d(-50%, -50%, 0);
+    opacity: 0;
+    animation: cb-spark-anim 800ms ease-out forwards;
+}
+@keyframes cb-spark-anim {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Reduced motion: freeze every animation */
+@media (prefers-reduced-motion: reduce) {
+    #cinematicCursor,
+    .cb-burst,
+    .cb-spark { animation: none !important; transition: none !important; }
+    #cinematicCursor { opacity: 0 !important; }
+}
+
+/* Dimmer mode for content-heavy pages like main.php */
+body[data-cb-intensity="dim"] #cinematicCanvas { opacity: 0.55; }
+body[data-cb-intensity="dim"] #cinematicCursor { opacity: 0.42; }
+
+/* Make sure the site content sits above the bg — apply via a wrapper class. */
+.cb-above { position: relative; z-index: 1; }
+
+/* When cinematic-bg is active on a page that ALSO has a designer-background
+ * override layer (#bgThemeOverride is used by main.php / set.php / games for
+ * custom user backgrounds), hide the override so the cinematic visuals win.
+ * Without this, the designer background would paint on top of #cinematicCanvas
+ * because both sit at z-index 0 and the override is later in DOM order. */
+body[data-cinematic-bg] #bgThemeOverride,
+body[data-cinematic-bg] .bg-theme-override { display: none !important; }

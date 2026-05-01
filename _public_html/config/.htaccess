@@ -1,0 +1,19 @@
+# Protect config directory - Deny all direct access
+# This ensures database credentials cannot be accessed directly via browser
+
+Order Deny,Allow
+Deny from all
+
+# Alternative for Apache 2.4+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect any potential env files
+<FilesMatch "\.(env|ini|conf|cfg)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
