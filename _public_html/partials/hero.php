@@ -1,10 +1,10 @@
-<section class="hero">
+ï»¿<section class="hero">
     <div class="hero-eyebrow">
         <span class="pulse-dot"></span>
-        <span>Now in v7.0 — New AI & Community Features</span>
+        <span>Now in v7.2 - Cinematic UI Overhaul</span>
     </div>
-    <h1 class="hero-headline" id="heroHeadline">Your Digital Universe Awaits</h1>
-    <p class="hero-sub">Games, AI chat, and a thriving community — all in one immersive platform built for enthusiasts.</p>
+    <h1 class="hero-headline" id="heroHeadline" data-text="Your Digital Universe Awaits"></h1>
+    <p class="hero-sub">Games, AI chat, and a thriving community - all in one immersive platform built for enthusiasts.</p>
     <div class="hero-ctas">
         <a href="#" class="btn-primary float-btn ripple-container" id="startExploringBtn" aria-label="Start your digital journey">Start Exploring <i class="fas fa-rocket" aria-hidden="true"></i></a>
         <a href="#features" class="btn-secondary float-btn ripple-container" data-action="nav-section" aria-label="View features">See What's Inside</a>

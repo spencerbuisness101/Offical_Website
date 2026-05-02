@@ -46,18 +46,35 @@
         }
     }
 
-    // === HERO HEADLINE — instant reveal, no char delay ===
-    (function() {
+    // === HERO HEADLINE — typewriter reveal ===
+    (function initTypewriter() {
         const el = document.getElementById('heroHeadline');
         if (!el) return;
+        const text = el.getAttribute('data-text') || '';
+        let i = 0;
+        el.textContent = '';
         el.style.opacity = '1';
         el.style.transform = 'none';
-        // Apply accent gradient to "Universe" via simple span wrap
-        const text = el.textContent;
-        const idx = text.indexOf('Universe');
-        if (idx >= 0) {
-            el.innerHTML = text.slice(0, idx) + '<span class="accent-word">Universe</span>' + text.slice(idx + 8);
+
+        function type() {
+            if (i < text.length) {
+                // Special handling for "Universe" to add accent class later or mid-stream
+                // For simplicity, we type it all and then wrap the word
+                el.textContent += text.charAt(i);
+                i++;
+                setTimeout(type, 80 + Math.random() * 40);
+            } else {
+                // Typing finished, wrap "Universe" in accent span
+                const currentText = el.textContent;
+                const idx = currentText.indexOf('Universe');
+                if (idx >= 0) {
+                    el.innerHTML = currentText.slice(0, idx) + '<span class="accent-word">Universe</span>' + currentText.slice(idx + 8);
+                }
+                el.classList.add('typing-done');
+            }
         }
+        // Start typing after a short delay
+        setTimeout(type, 600);
     })();
 
     // === INTERSECTION OBSERVER — REVEAL ===
@@ -99,9 +116,14 @@
     }
 
     if (revealObserver) {
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        document.querySelectorAll('.reveal').forEach((el, index) => {
+            // Stagger reveal for pricing cards specifically
+            if (el.classList.contains('pricing-card')) {
+                el.style.transitionDelay = (index * 0.1) + 's';
+            }
+            revealObserver.observe(el);
+        });
     } else {
-        // Fallback: show all reveal elements immediately if IntersectionObserver not supported
         document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
     }
 

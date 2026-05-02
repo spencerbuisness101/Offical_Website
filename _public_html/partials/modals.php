@@ -1,7 +1,7 @@
 <!-- Account Prompt Modal -->
 <div class="s-modal-overlay" id="accountPromptModal">
     <div class="s-modal modal-narrow">
-        <button type="button" class="s-modal-close" aria-label="Close">?</button>
+        <button type="button" class="s-modal-close" aria-label="Close" data-action="close-account-prompt">×</button>
         <h2 class="s-modal-title">Choose Your Path</h2>
         <div class="modal-grid">
             <div class="modal-card">
@@ -18,80 +18,121 @@
     </div>
 </div>
 
-<!-- Plan Comparison Modal -->
+<!-- Modernized Feature Matrix Modal -->
 <div class="s-modal-overlay" id="compareModal" role="dialog" aria-modal="true">
-    <div class="s-modal modal-wide" role="document">
+    <div class="s-modal modal-wide comparison-modal" role="document">
         <button class="s-modal-close" aria-label="Close" data-action="close-compare-modal">×</button>
-        <h2 class="s-modal-title">Feature Comparison</h2>
-        <div class="compare-table-wrap">
-            <table class="compare-table">
-                <thead>
-                    <tr>
-                        <th>Features</th>
-                        <th>Community</th>
-                        <th>Monthly</th>
-                        <th class="col-yearly">Yearly</th>
-                        <th>Lifetime</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Unlimited Game Access</td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                    </tr>
-                    <tr>
-                        <td>AI Assistant Access</td>
-                        <td><span class="compare-limited">Limited</span></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Custom Profile Themes</td>
-                        <td><i class="fas fa-times compare-cross"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Community Badge</td>
-                        <td>Basic</td>
-                        <td>Premium</td>
-                        <td>Elite</td>
-                        <td>Lifetime OG</td>
-                    </tr>
-                    <tr>
-                        <td>Priority Support</td>
-                        <td><i class="fas fa-times compare-cross"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Exclusive Beta Access</td>
-                        <td><i class="fas fa-times compare-cross"></i></td>
-                        <td><i class="fas fa-times compare-cross"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                        <td><i class="fas fa-check compare-check"></i></td>
-                    </tr>
-                </tbody>
-            </table>
+        
+        <div class="modal-header-cinematic">
+            <h2 class="s-modal-title">Feature Comparison Matrix</h2>
+            <p class="modal-subtitle">A detailed breakdown of how we elevate your digital experience.</p>
         </div>
-        <div class="compare-actions">
-            <a href="shop.php?plan=monthly" class="btn-primary compare-cta">Get Monthly</a>
-            <a href="shop.php?plan=yearly" class="btn-primary compare-cta-yearly">Get Yearly (Save 11%)</a>
+
+        <div class="comparison-matrix-container">
+            <!-- Matrix Headers -->
+            <div class="matrix-row matrix-header">
+                <div class="feature-col">Feature</div>
+                <div class="plan-col">Community</div>
+                <div class="plan-col">Monthly</div>
+                <div class="plan-col highlight">Yearly</div>
+                <div class="plan-col">Lifetime</div>
+            </div>
+
+            <!-- Core Access Group -->
+            <div class="matrix-group">
+                <div class="group-title"><i class="fas fa-gamepad"></i> Core Platform Access</div>
+                
+                <div class="matrix-row">
+                    <div class="feature-col">
+                        <span class="feature-name">Browser Games</span>
+                        <span class="feature-hint">70+ instant-play HTML5 games</span>
+                    </div>
+                    <div class="plan-col">Full Access</div>
+                    <div class="plan-col">Unlimited</div>
+                    <div class="plan-col highlight">Unlimited</div>
+                    <div class="plan-col">Unlimited</div>
+                </div>
+
+                <div class="matrix-row">
+                    <div class="feature-col">
+                        <span class="feature-name">Global Rankings</span>
+                        <span class="feature-hint">Compete on worldwide leaderboards</span>
+                    </div>
+                    <div class="plan-col"><i class="fas fa-check-circle text-teal"></i></div>
+                    <div class="plan-col"><i class="fas fa-check-circle text-teal"></i></div>
+                    <div class="plan-col highlight"><i class="fas fa-check-circle text-gold"></i></div>
+                    <div class="plan-col"><i class="fas fa-check-circle text-gold"></i></div>
+                </div>
+            </div>
+
+            <!-- AI & Social Group -->
+            <div class="matrix-group">
+                <div class="group-title"><i class="fas fa-brain"></i> AI & Intelligence</div>
+                
+                <div class="matrix-row">
+                    <div class="feature-col">
+                        <span class="feature-name">AI Personalities</span>
+                        <span class="feature-hint">Chat with unique AI entities</span>
+                    </div>
+                    <div class="plan-col">30/Day</div>
+                    <div class="plan-col">Unlimited</div>
+                    <div class="plan-col highlight">Unlimited</div>
+                    <div class="plan-col">Unlimited</div>
+                </div>
+
+                <div class="matrix-row">
+                    <div class="feature-col">
+                        <span class="feature-name">Custom Themes</span>
+                        <span class="feature-hint">Personalize your UI & Profile</span>
+                    </div>
+                    <div class="plan-col"><i class="fas fa-times-circle text-dim"></i></div>
+                    <div class="plan-col"><i class="fas fa-check-circle text-teal"></i></div>
+                    <div class="plan-col highlight"><i class="fas fa-check-circle text-gold"></i></div>
+                    <div class="plan-col"><i class="fas fa-check-circle text-gold"></i></div>
+                </div>
+            </div>
+
+            <!-- Support & Perks Group -->
+            <div class="matrix-group">
+                <div class="group-title"><i class="fas fa-star"></i> Exclusive Perks</div>
+                
+                <div class="matrix-row">
+                    <div class="feature-col">
+                        <span class="feature-name">Support Priority</span>
+                    </div>
+                    <div class="plan-col">Standard</div>
+                    <div class="plan-col">High</div>
+                    <div class="plan-col highlight">VIP Lane</div>
+                    <div class="plan-col">VIP Dedicated</div>
+                </div>
+
+                <div class="matrix-row">
+                    <div class="feature-col">
+                        <span class="feature-name">Early Beta Access</span>
+                    </div>
+                    <div class="plan-col"><i class="fas fa-times-circle text-dim"></i></div>
+                    <div class="plan-col"><i class="fas fa-times-circle text-dim"></i></div>
+                    <div class="plan-col highlight"><i class="fas fa-check-circle text-gold"></i></div>
+                    <div class="plan-col"><i class="fas fa-check-circle text-gold"></i></div>
+                </div>
+            </div>
         </div>
-        <p class="compare-footnote">All plans include 24/7 community access and core platform updates. <a href="terms.php">Terms apply</a>.</p>
+
+        <div class="matrix-footer">
+            <div class="matrix-cta-group">
+                <a href="shop.php?plan=monthly" class="matrix-btn">Get Monthly</a>
+                <a href="shop.php?plan=yearly" class="matrix-btn primary">Claim Yearly (Best Value)</a>
+                <a href="shop.php?plan=lifetime" class="matrix-btn">Get Lifetime</a>
+            </div>
+            <p class="matrix-footnote">*Prices in USD. Cancel anytime. All tiers contribute to platform growth.</p>
+        </div>
     </div>
 </div>
 
 <!-- Community Signup Modal -->
 <div class="s-modal-overlay" id="communityModal" role="dialog" aria-modal="true">
     <div class="s-modal" role="document">
-        <button class="s-modal-close" aria-label="Close">?</button>
+        <button class="s-modal-close" aria-label="Close" data-action="close-community-modal">×</button>
         <div id="communityMainView">
             <h2 class="s-modal-title">Welcome to the Community</h2>
             <div class="community-tiles">
