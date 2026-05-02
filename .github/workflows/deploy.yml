@@ -9,21 +9,62 @@ jobs:
   web-deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
     - name: Get latest code
       uses: actions/checkout@v4
-      
-    - name: Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./_public_html/
-        server-dir: ./
-        log-level: verbose
-        exclude: |
-          **/.env
-          **/logs/**
+
+    - name: Find FTP root and deploy
+      env:
+        FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+        FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      run: |
+        sudo apt-get install -y lftp
+
+        echo "=== Step 1: Probe FTP directory structure ==="
+        lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "ftp://$FTP_SERVER" -e "
+          pwd;
+          ls;
+          quit
+        " 2>&1 || true
+
+        echo ""
+        echo "=== Step 2: Check if public_html exists as a subdirectory ==="
+        lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "ftp://$FTP_SERVER" -e "
+          ls public_html/ 2>/dev/null && echo 'public_html/ EXISTS as subdirectory';
+          quit
+        " 2>&1 || echo "public_html/ does NOT exist as subdirectory (FTP user is likely chrooted into it)"
+
+        echo ""
+        echo "=== Step 3: Check for index.php at FTP root ==="
+        lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "ftp://$FTP_SERVER" -e "
+          ls -la index.php 2>/dev/null && echo 'index.php found at FTP root';
+          quit
+        " 2>&1 || echo "index.php NOT found at FTP root"
+
+        echo ""
+        echo "=== Step 4: Deploy files via mirror ==="
+        # Based on the probe results, we'll try FTP root first
+        # mirror --reverse uploads local to remote
+        # --verbose shows what's happening
+        # --exclude patterns protect server-only files
+        lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "ftp://$FTP_SERVER" -e "
+          set ftp:ssl-allow no;
+          set mirror:parallel-transfer-count 5;
+          mirror --reverse --verbose --delete \
+            --exclude ^\.env$ \
+            --exclude ^\.env\. \
+            --exclude ^logs/ \
+            --exclude ^\.well-known/ \
+            --exclude ^\.ftp-deploy-sync-state\.json$ \
+            ./_public_html/ ./;
+          quit
+        "
+
+        echo ""
+        echo "=== Step 5: Verify deployment ==="
+        lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "ftp://$FTP_SERVER" -e "
+          ls cache_reset.php && echo 'SUCCESS: cache_reset.php deployed to FTP root';
+          ls index.php && echo 'SUCCESS: index.php exists at FTP root';
+          quit
+        " 2>&1
