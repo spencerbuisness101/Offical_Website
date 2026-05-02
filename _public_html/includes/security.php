@@ -255,18 +255,18 @@ function logSecurityEvent($event, $details = []) {
  */
 function generateCSPHeader() {
     $csp  = "default-src 'self'; ";
-    $csp .= "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://rawcdn.githack.com https://www.google.com https://www.gstatic.com https://accounts.google.com https://apis.google.com; ";
+    $csp .= "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://www.google.com https://www.gstatic.com https://accounts.google.com https://apis.google.com; ";
     $csp .= "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://fonts.googleapis.com https://www.google.com; ";
     $csp .= "img-src 'self' data: blob: https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ";
     $csp .= "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; ";
     $csp .= "connect-src 'self' https://api.groq.com https://challenges.cloudflare.com https://www.google.com https://accounts.google.com https://cdn.jsdelivr.net; ";
-    $csp .= "frame-src 'self' https://challenges.cloudflare.com https://searchprox.global.ssl.fastly.net https://thespencergamingwebsite.com https://*.voidnetwork.space.cdn.cloudflare.net https://c.voidnetwork.space.cdn.cloudflare.net https://archive.org https://rawcdn.githack.com https://www.google.com https://accounts.google.com; ";
+    $csp .= "frame-src 'self' https://challenges.cloudflare.com https://searchprox.global.ssl.fastly.net https://thespencergamingwebsite.com https://archive.org https://www.google.com https://accounts.google.com; ";
     $csp .= "worker-src 'self' blob:; ";
     $csp .= "frame-ancestors 'none'; ";
     $csp .= "base-uri 'self'; ";
     $csp .= "object-src 'none'; ";
     $csp .= "form-action 'self'; ";
-    // report-uri removed — endpoint does not exist and floods console with 404s
+    $csp .= "upgrade-insecure-requests; ";
 
     return $csp;
 }
@@ -282,6 +282,7 @@ function setSecurityHeaders() {
     header("Referrer-Policy: strict-origin-when-cross-origin");
     header("Strict-Transport-Security: max-age=63072000; includeSubDomains; preload");
     header("Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self), usb=(), xr-spatial-tracking=(), interest-cohort=(), browsing-topics=(), attribution-reporting=(), run-ad-auction=(), join-ad-interest-group=()");
+    header_remove("X-Powered-By");
 }
 
 /**

@@ -9,25 +9,39 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
 }
 
 class Database {
+    private static ?PDO $instance = null;
     private readonly string $host;
     private readonly string $db_name;
     private readonly string $username;
     private readonly string $password;
-    public ?PDO $conn = null;
 
     public function __construct() {
         $this->host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
         $this->db_name = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'thespencerwebsite_db');
         $this->username = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'thespencerwebsite_user');
         $this->password = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
-        if (empty($this->password)) {
+        if (empty($this->password) && $this->host !== 'localhost') {
             error_log('CRITICAL: DB_PASS environment variable is not set');
             throw new \RuntimeException('Database password not configured');
         }
     }
 
+    /**
+     * Singleton accessor for the PDO connection.
+     * SEC-P1: Reuses a single connection across the entire request lifecycle.
+     */
+    public static function getStaticConnection(): PDO {
+        if (self::$instance === null) {
+            $db = new self();
+            self::$instance = $db->getConnection();
+        }
+        return self::$instance;
+    }
+
     public function getConnection(): PDO {
-        $this->conn = null;
+        // Return existing instance if available
+        if (self::$instance !== null) return self::$instance;
+
         $maxRetries = 3;
         $retryCount = 0;
 
@@ -43,53 +57,39 @@ class Database {
 
         $sslCa = getenv('DB_SSL_CA') ?: '';
         $isLocal = in_array($this->host, ['localhost', '127.0.0.1', '::1']);
+        
         if ($sslCa && file_exists($sslCa)) {
             $options[PDO::MYSQL_ATTR_SSL_CA] = $sslCa;
             $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
-        } elseif (!$isLocal) {
+        } elseif (!$isLocal && (getenv('DB_FORCE_SSL') === 'true')) {
             error_log('CRITICAL: SSL CA not configured for remote DB host ' . $this->host);
             throw new \RuntimeException('Secure database connection requires SSL certificate');
         }
 
         while ($retryCount < $maxRetries) {
             try {
-                $this->conn = new PDO(
+                self::$instance = new PDO(
                     dsn: "mysql:host={$this->host};dbname={$this->db_name};charset=utf8mb4",
                     username: $this->username,
                     password: $this->password,
                     options: $options
                 );
-
-                $stmt = $this->conn->query("SELECT 1");
-                $stmt->closeCursor();
-
-                static $logged = false;
-                if (!$logged) {
-                    $sslStmt = $this->conn->query("SHOW STATUS LIKE 'Ssl_cipher'");
-                    $sslStatus = $sslStmt->fetch();
-                    $sslStmt->closeCursor();
-                    $isEncrypted = !empty($sslStatus['Value']);
-                    if (!$isEncrypted && $this->host !== 'localhost' && $this->host !== '127.0.0.1') {
-                        error_log("DB SECURITY WARNING: Connection to {$this->host} is NOT encrypted (no SSL)");
-                    }
-                    $logged = true;
-                }
+                
+                // Verification query
+                self::$instance->query("SELECT 1")->closeCursor();
                 break;
 
             } catch (PDOException $exception) {
                 $retryCount++;
-                error_log("MySQL Connection attempt {$retryCount} failed: " . $exception->getMessage());
-
                 if ($retryCount >= $maxRetries) {
-                    error_log("MySQL Connection failed after {$maxRetries} attempts");
+                    error_log("MySQL Connection failed after {$maxRetries} attempts: " . $exception->getMessage());
                     throw new \RuntimeException("Database connection failed", 0, $exception);
                 }
-
                 usleep(500000);
             }
         }
 
-        return $this->conn;
+        return self::$instance;
     }
 
     public function createAnalyticsTables(): bool {

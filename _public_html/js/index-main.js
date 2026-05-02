@@ -59,19 +59,98 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         }
     }
 
-    // Delegation for clicks
+    // === UNIFIED EVENT DELEGATION (v7.6 Optimized) ===
     document.addEventListener('click', e => {
-        const target = e.target.closest('[data-action]');
+        const target = e.target.closest('[data-action], [data-href], [data-showcase], [data-feature]');
         if (!target) return;
 
         const action = target.getAttribute('data-action');
+        const href = target.getAttribute('data-href');
+        const showcase = target.getAttribute('data-showcase');
         const feature = target.getAttribute('data-feature');
 
-        if (action === 'open-feature-detail') {
-            e.preventDefault();
-            openFeatureDetail(feature);
-        } else if (action === 'close-feature-detail') {
-            closeFeatureDetail();
+        // Handle data-href (highest priority navigation)
+        if (href) {
+            window.location.href = href;
+            return;
+        }
+
+        // Handle data-showcase
+        if (showcase && typeof showcasePrompt === 'function') {
+            showcasePrompt(showcase, e);
+            return;
+        }
+
+        // Handle data-action switch
+        if (action) {
+            switch (action) {
+                case 'open-feature-detail':
+                    e.preventDefault();
+                    openFeatureDetail(feature);
+                    break;
+                case 'close-feature-detail':
+                    closeFeatureDetail();
+                    break;
+                case 'landing':
+                    e.preventDefault();
+                    if (typeof transitionToLanding === 'function') transitionToLanding();
+                    break;
+                case 'login':
+                    e.preventDefault();
+                    if (typeof transitionToLogin === 'function') transitionToLogin(e);
+                    break;
+                case 'login-close-prompt':
+                    e.preventDefault();
+                    if (typeof closeAccountPrompt === 'function') closeAccountPrompt();
+                    if (typeof transitionToLogin === 'function') transitionToLogin(e);
+                    break;
+                case 'login-close-community':
+                    e.preventDefault();
+                    if (typeof closeCommunityModal === 'function') closeCommunityModal();
+                    if (typeof transitionToLogin === 'function') transitionToLogin(e);
+                    break;
+                case 'community-modal':
+                    e.preventDefault();
+                    if (typeof openCommunityModal === 'function') openCommunityModal(e);
+                    break;
+                case 'community-modal-close-prompt':
+                    e.preventDefault();
+                    if (typeof closeAccountPrompt === 'function') closeAccountPrompt();
+                    if (typeof openCommunityModal === 'function') openCommunityModal(e);
+                    break;
+                case 'community-modal-close-compare':
+                    e.preventDefault();
+                    if (typeof closeCompareModal === 'function') closeCompareModal();
+                    if (typeof openCommunityModal === 'function') openCommunityModal(e);
+                    break;
+                case 'compare-modal':
+                case 'open-compare-modal':
+                    e.preventDefault();
+                    if (typeof openCompareModal === 'function') openCompareModal(e);
+                    break;
+                case 'close-compare-modal':
+                    e.preventDefault();
+                    if (typeof closeCompareModal === 'function') closeCompareModal();
+                    break;
+                case 'create-guest':
+                    e.preventDefault();
+                    if (typeof createGuestAccount === 'function') createGuestAccount(e);
+                    break;
+                case 'show-guest-disclosure':
+                    e.preventDefault();
+                    if (typeof showGuestDisclosure === 'function') showGuestDisclosure();
+                    break;
+                case 'toggle-dropdown':
+                    e.preventDefault();
+                    target.parentElement?.classList.toggle('open');
+                    break;
+                case 'nav-section':
+                    e.preventDefault();
+                    const hash = target.getAttribute('href') || '';
+                    if (typeof navToSection === 'function' && hash) navToSection(e, hash);
+                    target.closest('.mobile-menu')?.classList.remove('open');
+                    break;
+            }
         }
     });
 
@@ -90,7 +169,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     if (navbar) {
         window.addEventListener('scroll', () => {
             navbar.classList.toggle('scrolled', window.scrollY > 60);
-        });
+        }, { passive: true });
     }
 
     // === MOBILE MENU ===
@@ -864,140 +943,6 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
     // === CSP-COMPLIANT EVENT WIRING (replaces all inline onclick handlers) ===
     (function() {
-        // --- data-action delegation ---
-        document.body.addEventListener('click', function(e) {
-            var el = e.target.closest('[data-action]');
-            if (!el) return;
-            var action = el.getAttribute('data-action');
-            if (!action) return;
-
-            switch (action) {
-                case 'landing':
-                    e.preventDefault();
-                    if (typeof transitionToLanding === 'function') transitionToLanding();
-                    break;
-                case 'login':
-                    e.preventDefault();
-                    if (typeof transitionToLogin === 'function') transitionToLogin(e);
-                    break;
-                case 'login-close-prompt':
-                    e.preventDefault();
-                    if (typeof closeAccountPrompt === 'function') closeAccountPrompt();
-                    if (typeof transitionToLogin === 'function') transitionToLogin(e);
-                    break;
-                case 'login-close-community':
-                    e.preventDefault();
-                    if (typeof closeCommunityModal === 'function') closeCommunityModal();
-                    if (typeof transitionToLogin === 'function') transitionToLogin(e);
-                    break;
-                case 'community-modal':
-                    e.preventDefault();
-                    if (typeof openCommunityModal === 'function') openCommunityModal(e);
-                    break;
-                case 'community-modal-close-prompt':
-                    e.preventDefault();
-                    if (typeof closeAccountPrompt === 'function') closeAccountPrompt();
-                    if (typeof openCommunityModal === 'function') openCommunityModal(e);
-                    break;
-                case 'community-modal-close-compare':
-                    e.preventDefault();
-                    if (typeof closeCompareModal === 'function') closeCompareModal();
-                    if (typeof openCommunityModal === 'function') openCommunityModal(e);
-                    break;
-                case 'compare-modal':
-                case 'open-compare-modal':
-                    e.preventDefault();
-                    if (typeof openCompareModal === 'function') openCompareModal(e);
-                    break;
-                case 'close-compare-modal':
-                    e.preventDefault();
-                    if (typeof closeCompareModal === 'function') closeCompareModal();
-                    break;
-                case 'create-guest':
-                    e.preventDefault();
-                    if (typeof createGuestAccount === 'function') createGuestAccount(e);
-                    break;
-                case 'show-guest-disclosure':
-                    e.preventDefault();
-                    if (typeof showGuestDisclosure === 'function') showGuestDisclosure();
-                    break;
-                case 'toggle-dropdown':
-                    e.preventDefault();
-                    var parent = el.parentElement;
-                    if (parent) parent.classList.toggle('open');
-                    break;
-                case 'nav-section':
-                    e.preventDefault();
-                    var hash = el.getAttribute('href') || '';
-                    if (typeof navToSection === 'function' && hash) navToSection(e, hash);
-                    // close mobile menu if inside it
-                    var inMobile = el.closest('.mobile-menu');
-                    if (inMobile && typeof closeMobileMenu === 'function') closeMobileMenu();
-                    break;
-            }
-        });
-
-        // --- data-href navigation ---
-        document.body.addEventListener('click', function(e) {
-            var el = e.target.closest('[data-href]');
-            if (!el) return;
-            var href = el.getAttribute('data-href');
-            if (href) window.location.href = href;
-        });
-
-        // --- data-showcase handlers ---
-        document.body.addEventListener('click', function(e) {
-            var el = e.target.closest('[data-showcase]');
-            if (!el) return;
-            var feature = el.getAttribute('data-showcase');
-            if (feature && typeof showcasePrompt === 'function') showcasePrompt(feature, e);
-        });
-
-        // --- Showcase tabs ---
-        document.querySelectorAll('.showcase-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                var target = this.getAttribute('data-tab');
-                if (target && typeof switchShowcase === 'function') switchShowcase(target, this);
-            });
-        });
-
-        // --- Feature cards ---
-        document.querySelectorAll('.feature-card').forEach(function(card) {
-            card.addEventListener('click', function(e) {
-                if (typeof toggleFeature === 'function') toggleFeature(this, e);
-            });
-            card.addEventListener('keydown', function(e) {
-                if (typeof featureKeyHandler === 'function') featureKeyHandler(e, this);
-            });
-        });
-
-        // --- Feature card Sign In buttons ---
-        document.querySelectorAll('.feat-cta-primary').forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (typeof transitionToLogin === 'function') transitionToLogin(e);
-            });
-        });
-
-        // --- Hamburger ---
-        var hamburger = document.getElementById('hamburger');
-        if (hamburger && typeof toggleMobileMenu === 'function') {
-            hamburger.addEventListener('click', toggleMobileMenu);
-        }
-
-        // --- Tour controls ---
-        var tourSkip = document.querySelector('.tour-skip');
-        if (tourSkip && typeof skipTour === 'function') {
-            tourSkip.addEventListener('click', skipTour);
-        }
-        var tourBtn = document.getElementById('tourBtn');
-        if (tourBtn && typeof nextTourStep === 'function') {
-            tourBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                nextTourStep();
-            });
-        }
-
         // --- Modal close buttons ---
         document.querySelectorAll('.s-modal-close').forEach(function(btn) {
             btn.addEventListener('click', function() {
@@ -1009,32 +954,6 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
                 if (id === 'compareModal' && typeof closeCompareModal === 'function') closeCompareModal();
             });
         });
-
-        // --- Modal overlay click-to-close ---
-        document.querySelectorAll('.s-modal-overlay').forEach(function(overlay) {
-            overlay.addEventListener('click', function(e) {
-                if (e.target !== this) return;
-                var id = this.id;
-                if (id === 'accountPromptModal' && typeof closeAccountPrompt === 'function') closeAccountPrompt();
-                if (id === 'communityModal' && typeof closeCommunityModal === 'function') closeCommunityModal();
-                if (id === 'compareModal' && typeof closeCompareModal === 'function') closeCompareModal();
-            });
-        });
-
-        // --- Guest disclosure back ---
-        var btnCancelDisclosure = document.getElementById('btnCancelDisclosure');
-        if (btnCancelDisclosure && typeof hideGuestDisclosure === 'function') {
-            btnCancelDisclosure.addEventListener('click', hideGuestDisclosure);
-        }
-
-        // --- Compare modal -> community modal ---
-        var btnCompareToCommunity = document.getElementById('btnCompareToCommunity');
-        if (btnCompareToCommunity) {
-            btnCompareToCommunity.addEventListener('click', function() {
-                if (typeof closeCompareModal === 'function') closeCompareModal();
-                if (typeof openCommunityModal === 'function') openCommunityModal();
-            });
-        }
 
         // --- Nav hash links without data-action ---
         document.querySelectorAll('.nav-links a[href^="#"], .hero-ctas a[href^="#"]').forEach(function(link) {

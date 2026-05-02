@@ -143,8 +143,7 @@ if (!empty($_SESSION['impersonating']) && isset($_SESSION['impersonate_expires']
     try {
         if (file_exists(__DIR__ . '/../config/database.php')) {
             require_once __DIR__ . '/../config/database.php';
-            $database = new Database();
-            $db = $database->getConnection();
+            $db = Database::getStaticConnection();
             $stmt = $db->prepare("SELECT username FROM users WHERE id = ?");
             $stmt->execute([$impersonatorId]);
             $admin = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -218,13 +217,11 @@ if (!empty($_SESSION['is_guest']) && !empty($_SESSION['user_id'])) {
         try {
             if (file_exists(__DIR__ . '/../config/database.php')) {
                 require_once __DIR__ . '/../config/database.php';
-                if (class_exists('Database')) {
-                    $__guest_db = (new Database())->getConnection();
-                    $stmt = $__guest_db->prepare("UPDATE users SET last_login = NOW() WHERE id = ? AND is_guest = 1");
-                    $stmt->execute([(int)$_SESSION['user_id']]);
-                    $stmt->closeCursor();
-                    $_SESSION['__guest_last_touch'] = time();
-                }
+                $__guest_db = Database::getStaticConnection();
+                $stmt = $__guest_db->prepare("UPDATE users SET last_login = NOW() WHERE id = ? AND is_guest = 1");
+                $stmt->execute([(int)$_SESSION['user_id']]);
+                $stmt->closeCursor();
+                $_SESSION['__guest_last_touch'] = time();
             }
         } catch (Exception $e) { /* non-critical, keep going */ }
     }
@@ -242,24 +239,22 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 
         if ($__lockdown_stale && file_exists(__DIR__ . '/../config/database.php')) {
             require_once __DIR__ . '/../config/database.php';
-            if (class_exists('Database')) {
-                $_lockdown_db = (new Database())->getConnection();
+            $_lockdown_db = Database::getStaticConnection();
 
-                // Get user status, tier, and age verification flag
-                $stmt = $_lockdown_db->prepare("SELECT account_status, account_tier, restriction_until, age_verified_at FROM users WHERE id = ?");
-                $stmt->execute([$_SESSION['user_id']]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                $stmt->closeCursor();
+            // Get user status, tier, and age verification flag
+            $stmt = $_lockdown_db->prepare("SELECT account_status, account_tier, restriction_until, age_verified_at FROM users WHERE id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
 
-                if ($user) {
-                    $_SESSION['_force_logout_last_check'] = time(); // Update force logout check too
-                    $_SESSION['_lockdown_check_at'] = time();
-                    $_SESSION['_lockdown_cached_user'] = $user;
-                    // Sync age_verified_at from DB into session so the escape hatch below
-                    // works immediately without waiting for the cache TTL to expire.
-                    if (!empty($user['age_verified_at']) && empty($_SESSION['age_verified_at'])) {
-                        $_SESSION['age_verified_at'] = $user['age_verified_at'];
-                    }
+            if ($user) {
+                $_SESSION['_force_logout_last_check'] = time(); // Update force logout check too
+                $_SESSION['_lockdown_check_at'] = time();
+                $_SESSION['_lockdown_cached_user'] = $user;
+                // Sync age_verified_at from DB into session so the escape hatch below
+                // works immediately without waiting for the cache TTL to expire.
+                if (!empty($user['age_verified_at']) && empty($_SESSION['age_verified_at'])) {
+                    $_SESSION['age_verified_at'] = $user['age_verified_at'];
                 }
             }
         }
@@ -370,13 +365,11 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
 
 // --- Live Threat Detector: block malicious IPs ---
 try {
-    if (file_exists(__DIR__ . '/threat_detector.php') && file_exists(__DIR__ . '/../config/database.php')) {
+    if (file_exists(__DIR__ . '/threat_detector.php')) {
         require_once __DIR__ . '/threat_detector.php';
         require_once __DIR__ . '/../config/database.php';
-        if (class_exists('Database')) {
-            $_td_db = (new Database())->getConnection();
-            checkBlockedIp($_td_db);
-        }
+        $_td_db = Database::getStaticConnection();
+        checkBlockedIp($_td_db);
     }
 } catch (Exception $e) {
     // Fail open — don't block legitimate users on DB errors
@@ -458,10 +451,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
         if (($__current_time - $__last_check) >= $__force_logout_check_interval) {
             try {
                 require_once __DIR__ . '/../config/database.php';
-                if (class_exists('Database')) {
-                    $__db_check = new Database();
-                    $__conn_check = $__db_check->getConnection();
-                    if ($__conn_check) {
+                $__conn_check = Database::getStaticConnection();
+                if ($__conn_check) {
                         // Check if user has been force logged out
                         $__stmt_check = $__conn_check->prepare("SELECT force_logout_at FROM users WHERE id = ?");
                         $__stmt_check->execute([$_SESSION['user_id']]);
@@ -518,8 +509,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true
             try {
                 if (!isset($__conn_check)) {
                     require_once __DIR__ . '/../config/database.php';
-                    $__db_sub = new Database();
-                    $__conn_sub = $__db_sub->getConnection();
+                    $__conn_sub = Database::getStaticConnection();
                 } else {
                     $__conn_sub = $__conn_check;
                 }
