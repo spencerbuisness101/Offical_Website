@@ -1,34 +1,36 @@
-<nav class="navbar" id="navbar">
-    <a href="#" class="nav-brand" data-action="landing">
-        <i class="fas fa-gem nav-brand-icon"></i>
-        <span>SPENCER'S</span>
-    </a>
-    <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="donate.php">Donate</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#" data-action="community-modal">Community</a></li>
-        <li class="nav-dropdown">
-            <a href="#" class="nav-dropdown-toggle" data-action="toggle-dropdown">
-                Policies <i class="fas fa-chevron-down nav-dropdown-chevron"></i>
-            </a>
-            <div class="nav-dropdown-menu">
-                <a href="privacy.php">Privacy Policy</a>
-                <a href="terms.php">Terms of Service</a>
-                <a href="acceptable-use.php">Acceptable Use</a>
-                <a href="cookie-policy.php">Cookie Policy</a>
-                <a href="community-standards.php">Community Standards</a>
-                <a href="refund-policy.php">Refund Policy</a>
-                <a href="dmca.php">DMCA & Copyright</a>
-                <a href="childrens-privacy.php">Children's Privacy</a>
-                <a href="accessibility.php">Accessibility</a>
-            </div>
-        </li>
-        <li><a href="#" class="btn-ghost float-btn ripple-container" data-action="login">Sign In</a></li>
-    </ul>
-    <button type="button" class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-    </button>
+<nav class="navbar floating-nav" id="navbar">
+    <div class="nav-container">
+        <a href="#!" class="nav-brand" data-action="landing">
+            <div class="brand-logo"><i class="fas fa-gem"></i></div>
+            <div class="brand-text">SPENCER'S</div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link-item">Features</a></li>
+            <li><a href="donate.php" class="nav-link-item">Donate</a></li>
+            <li><a href="#pricing" class="nav-link-item">Pricing</a></li>
+            <li><a href="#!" data-action="community-modal" class="nav-link-item">Community</a></li>
+            <li class="nav-dropdown">
+                <a href="#!" class="nav-dropdown-toggle nav-link-item" data-action="toggle-dropdown">
+                    Policies <i class="fas fa-chevron-down nav-dropdown-chevron"></i>
+                </a>
+                <div class="nav-dropdown-menu glass-menu">
+                    <a href="privacy.php">Privacy Policy</a>
+                    <a href="terms.php">Terms of Service</a>
+                    <a href="acceptable-use.php">Acceptable Use</a>
+                    <a href="cookie-policy.php">Cookie Policy</a>
+                    <a href="community-standards.php">Community Standards</a>
+                    <a href="refund-policy.php">Refund Policy</a>
+                    <a href="dmca.php">DMCA & Copyright</a>
+                    <a href="childrens-privacy.php">Children's Privacy</a>
+                    <a href="accessibility.php">Accessibility</a>
+                </div>
+            </li>
+            <li class="nav-cta-item"><a href="#!" class="btn-ghost float-btn ripple-container" data-action="login">Sign In</a></li>
+        </ul>
+        <button type="button" class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+    </div>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">

@@ -1,4 +1,75 @@
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // === FEATURE DETAILS LOGIC ===
+    const featureData = {
+        games: {
+            title: 'Exclusive Gaming Universe',
+            icon: '<i class="fas fa-gamepad"></i>',
+            body: 'Dive into a curated collection of HTML5 and WebGL experiences. From retro-inspired arcade games to high-fidelity 3D puzzles, our library is built for performance and instant fun. No downloads, no waiting—just click and play.'
+        },
+        ai: {
+            title: 'The AI Singularity',
+            icon: '<i class="fas fa-robot"></i>',
+            body: 'Our AI assistants aren\'t just chatbots. They feature memory persistence, emotional intelligence, and specialized knowledge bases. Whether you need a coding partner, a creative writer, or a casual conversationalist, they adapt to your specific needs.'
+        },
+        themes: {
+            title: 'Visual Sovereignty',
+            icon: '<i class="fas fa-paint-brush"></i>',
+            body: 'Express yourself with our deep customization engine. Change every aspect of your experience, from the blur intensity of the glass panels to the specific hue of your UI glow. Your profile, your rules.'
+        },
+        community: {
+            title: 'Vibrant Ecosystem',
+            icon: '<i class="fas fa-users"></i>',
+            body: 'Join a global network of creators and enthusiasts. Share your high scores, collaborate on creative projects, and participate in exclusive community events. This isn\'t just a platform; it\'s a home.'
+        },
+        cloud: {
+            title: 'Seamless Continuity',
+            icon: '<i class="fas fa-cloud"></i>',
+            body: 'Never lose a save state again. Our real-time cloud synchronization ensures your game progress, settings, and AI conversation history are available on every device. Start on desktop, continue on mobile.'
+        },
+        rankings: {
+            title: 'The Global Arena',
+            icon: '<i class="fas fa-trophy"></i>',
+            body: 'Prove your dominance in our real-time leaderboard system. Earn badges, unlock exclusive profile frames, and climb the ranks across all games. The world is watching—where will you stand?'
+        }
+    };
+
+    function openFeatureDetail(featureId) {
+        const data = featureData[featureId];
+        const modal = document.getElementById('featureDetailModal');
+        if (!data || !modal) return;
+
+        document.getElementById('detailIcon').innerHTML = data.icon;
+        document.getElementById('detailTitle').textContent = data.title;
+        document.getElementById('detailBody').textContent = data.body;
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeFeatureDetail() {
+        const modal = document.getElementById('featureDetailModal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Delegation for clicks
+    document.addEventListener('click', e => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        const action = target.getAttribute('data-action');
+        const feature = target.getAttribute('data-feature');
+
+        if (action === 'open-feature-detail') {
+            e.preventDefault();
+            openFeatureDetail(feature);
+        } else if (action === 'close-feature-detail') {
+            closeFeatureDetail();
+        }
+    });
 
     // === MOUSE TRACKER (used by multiple layers) ===
     const mouse = { x: -9999, y: -9999, nx: 0, ny: 0 };
@@ -34,8 +105,13 @@
         if (e && e.preventDefault) e.preventDefault();
         const loginPageEl = document.getElementById('loginPage');
         const scrollToTarget = () => {
-            const target = document.querySelector(hash);
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (!hash || hash === '#' || hash === '#!') return; // Safety check for empty hashes
+            try {
+                const target = document.querySelector(hash);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (err) {
+                console.warn('Invalid scroll target:', hash);
+            }
         };
         if (loginPageEl && loginPageEl.classList.contains('active')) {
             // Return to landing, then scroll after transition finishes
@@ -117,9 +193,9 @@
 
     if (revealObserver) {
         document.querySelectorAll('.reveal').forEach((el, index) => {
-            // Stagger reveal for pricing cards specifically
+            // Stagger reveal for pricing cards specifically - speed up to 0.05s
             if (el.classList.contains('pricing-card')) {
-                el.style.transitionDelay = (index * 0.1) + 's';
+                el.style.transitionDelay = (index * 0.05) + 's';
             }
             revealObserver.observe(el);
         });
@@ -257,6 +333,7 @@
             return;
         }
 
+        define('SITE_VERSION', '7.4');
         wipeOverlay.style.setProperty('--cx', '50%');
         wipeOverlay.style.setProperty('--cy', '50%');
         wipeOverlay.style.clipPath = 'circle(150% at 50% 50%)';

@@ -12,7 +12,7 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
 
 // Site version constant — single source of truth for displayed version string.
 // Used by page titles, footers, and anywhere the version is displayed.
-define('SITE_VERSION', '7.3');
+define('SITE_VERSION', '7.4');
 
 // Development mode: loads unminified JS/CSS assets (set false for production)
 define('DEBUG', true);
@@ -355,14 +355,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
                     if ($user['account_status'] === 'terminated') {
                         // Log out the user
                         session_destroy();
-                        setcookie('PHPSESSID', '', [
-                            'expires' => time() - 3600,
-                            'path' => '/',
-                            'domain' => '',
-                            'secure' => true,
-                            'httponly' => true,
-                            'samesite' => 'Strict'
-                        ]);
                         
                         if (!headers_sent()) {
                             header('Location: /auth/account_terminated.php');
