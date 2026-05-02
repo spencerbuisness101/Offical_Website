@@ -258,7 +258,7 @@ function generateCSPHeader() {
     $csp .= "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://rawcdn.githack.com https://www.google.com https://www.gstatic.com https://accounts.google.com https://apis.google.com; ";
     $csp .= "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://fonts.googleapis.com https://www.google.com; ";
     $csp .= "img-src 'self' data: blob: https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ";
-    $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
+    $csp .= "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; ";
     $csp .= "connect-src 'self' https://api.groq.com https://challenges.cloudflare.com https://www.google.com https://accounts.google.com https://cdn.jsdelivr.net; ";
     $csp .= "frame-src 'self' https://challenges.cloudflare.com https://searchprox.global.ssl.fastly.net https://thespencergamingwebsite.com https://*.voidnetwork.space.cdn.cloudflare.net https://c.voidnetwork.space.cdn.cloudflare.net https://archive.org https://rawcdn.githack.com https://www.google.com https://accounts.google.com; ";
     $csp .= "worker-src 'self' blob:; ";
@@ -266,7 +266,7 @@ function generateCSPHeader() {
     $csp .= "base-uri 'self'; ";
     $csp .= "object-src 'none'; ";
     $csp .= "form-action 'self'; ";
-    $csp .= "report-uri /api/csp-violation;";
+    // report-uri removed — endpoint does not exist and floods console with 404s
 
     return $csp;
 }

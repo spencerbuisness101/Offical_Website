@@ -1,4 +1,4 @@
-﻿<head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spencer's Website — Your Digital Universe</title>
@@ -12,9 +12,9 @@
     ?>
 
     <!-- Preloads -->
-    <link rel="preload" href="js/index-main<?php echo $assetExt; ?>.js?v=<?php echo $siteVersion; ?>" as="script">
-    <link rel="preload" href="js/index-modal<?php echo $assetExt; ?>.js?v=<?php echo $siteVersion; ?>" as="script">
-    <link rel="preload" href="css/tokens<?php echo $assetExt; ?>.css?v=<?php echo $siteVersion; ?>" as="style">
+    <link rel="preload" href="js/index-main.js?v=<?php echo $siteVersion; ?>" as="script">
+    <link rel="preload" href="js/index-modal.js?v=<?php echo $siteVersion; ?>" as="script">
+    <link rel="preload" href="css/tokens.css?v=<?php echo $siteVersion; ?>" as="style">
 
     <!-- Core Styles -->
     <link rel="stylesheet" href="css/tokens<?php echo $assetExt; ?>.css?v=<?php echo $siteVersion; ?>">

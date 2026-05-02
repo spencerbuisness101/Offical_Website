@@ -66,6 +66,11 @@ $user_id = $_SESSION['user_id'];
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/command-palette.css">
+    <link rel="stylesheet" href="css/cinematic-bg.css?v=7.1">
+    <link rel="stylesheet" href="main/css/main-page.css?v=7.1">
+
+    <!-- v7.1 Cinematic background module -->
+    <script src="js/cinematic-bg.js?v=7.1" defer></script>
 <style>
     body {
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -1097,9 +1102,54 @@ $user_id = $_SESSION['user_id'];
             font-size: 0.9rem;
         }
     }
+
+    /* ========================================
+       Cinematic UI Overhaul
+       ======================================== */
+    .page-header {
+        position: relative;
+        z-index: 2;
+    }
+    .page-header::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -10%; right: -10%; bottom: -50%;
+        background: radial-gradient(circle at center, rgba(45, 212, 191, 0.12), transparent 70%);
+        z-index: -1;
+        pointer-events: none;
+        animation: pulse-glow 6s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-glow {
+        0% { transform: scale(0.9); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Scroll-in animation */
+    .game-card {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.3s ease, border-color 0.3s ease !important;
+    }
+    .game-card.cinematic-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Enhanced glassmorphism hover */
+    .game-card:hover {
+        border-color: rgba(45, 212, 191, 0.35) !important;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.15),
+                    0 0 30px rgba(45, 212, 191, 0.15) !important;
+        transform: translateY(-6px) !important;
+    }
+
 </style>
 </head>
 <body data-backgrounds='<?php echo htmlspecialchars(json_encode($available_backgrounds), ENT_QUOTES, 'UTF-8'); ?>'
+      data-cinematic-bg="dim"
       data-active-background='<?php echo htmlspecialchars($active_designer_background['image_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>'>
     <?php require_once __DIR__ . '/includes/identity_bar_v2.php'; ?>
     <!-- Background Theme Override Element -->
@@ -1126,7 +1176,7 @@ $user_id = $_SESSION['user_id'];
     </div>
 
 
-    <div class="page-wrapper">
+    <main id="mainContent" class="mp-root" role="main">
 
         <!-- Back Link -->
         <a href="main.php" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
@@ -2280,6 +2330,47 @@ $user_id = $_SESSION['user_id'];
     <script src="js/command-palette.js"></script>
 
     <?php require __DIR__ . '/includes/site_footer.php'; ?>
+
+
+    <!-- Cinematic UI Scripts -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Intersection Observer for scroll-in stagger
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('cinematic-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        var cards = document.querySelectorAll('.game-card');
+        cards.forEach(function(card, index) {
+            card.style.transitionDelay = ((index % 4) * 0.1) + 's';
+            observer.observe(card);
+
+            // 3D Tilt Logic
+            card.addEventListener('mousemove', function(e) {
+                var rect = card.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                var centerX = rect.width / 2;
+                var centerY = rect.height / 2;
+                var rotateX = ((y - centerY) / centerY) * -8;
+                var rotateY = ((x - centerX) / centerX) * 8;
+                card.style.transitionDelay = '0s';
+                card.style.transitionDuration = '0.1s';
+                card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02, 1.02, 1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                card.style.transitionDuration = '0.5s';
+                card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            });
+        });
+    });
+    </script>
 
 </body>
 </html>

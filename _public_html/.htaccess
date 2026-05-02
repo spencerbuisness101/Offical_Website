@@ -1,4 +1,4 @@
-﻿# Spencer's Website v7.0 - Hostinger/LiteSpeed .htaccess
+# Spencer's Website v7.0 - Hostinger/LiteSpeed .htaccess
 # Security Overhaul â€” Full header suite, CORS, favicon, hardened rules
 # ============================================================
 
@@ -119,11 +119,9 @@ ServerSignature Off
     # --- Permissions-Policy (privacy-focused: disable tracking features) ---
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self), usb=(), xr-spatial-tracking=(), interest-cohort=(), browsing-topics=(), attribution-reporting=(), run-ad-auction=(), join-ad-interest-group=()"
 
-    # --- Content-Security-Policy (with upgrade-insecure-requests) ---
-    # v7.1: Font Awesome self-hosted from /assets/vendor/fontawesome/. Dropped
-    # cdnjs.cloudflare.com from font-src (no longer needed). Added object-src,
-    # base-uri, form-action, frame-ancestors hardening.
-    Header always set Content-Security-Policy "upgrade-insecure-requests; default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://rawcdn.githack.com https://www.google.com https://www.gstatic.com https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://www.google.com https://challenges.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; img-src 'self' data: blob: https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://api.groq.com https://challenges.cloudflare.com https://www.google.com https://accounts.google.com https://cdn.jsdelivr.net; frame-src 'self' https://challenges.cloudflare.com https://searchprox.global.ssl.fastly.net https://thespencergamingwebsite.com https://*.voidnetwork.space.cdn.cloudflare.net https://c.voidnetwork.space.cdn.cloudflare.net https://archive.org https://rawcdn.githack.com https://www.google.com https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'; worker-src 'self' blob:; report-uri /api/csp-violation"
+    # v7.1: Font Awesome CDN still loads font files from cdnjs. Added
+    # cdnjs.cloudflare.com to font-src. Removed dead report-uri /api/csp-violation.
+    Header always set Content-Security-Policy "upgrade-insecure-requests; default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://rawcdn.githack.com https://www.google.com https://www.gstatic.com https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://www.google.com https://challenges.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com https://cdnjs.cloudflare.com data:; img-src 'self' data: blob: https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://api.groq.com https://challenges.cloudflare.com https://www.google.com https://accounts.google.com https://cdn.jsdelivr.net; frame-src 'self' https://challenges.cloudflare.com https://searchprox.global.ssl.fastly.net https://thespencergamingwebsite.com https://*.voidnetwork.space.cdn.cloudflare.net https://c.voidnetwork.space.cdn.cloudflare.net https://archive.org https://rawcdn.githack.com https://www.google.com https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'; worker-src 'self' blob:"
 
     # --- Cross-Origin Policies ---
     Header always set Cross-Origin-Opener-Policy "same-origin"
