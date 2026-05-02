@@ -162,6 +162,10 @@ class DeviceFingerprinter {
     }
 
     sendToServer() {
+        // Throttle: only send once per hour to avoid 429 rate-limit
+        const lastSent = parseInt(localStorage.getItem('sw_fp_last') || '0', 10);
+        if (Date.now() - lastSent < 3600000) return; // 1 hour cooldown
+
         const payload = JSON.stringify(this.data);
         if (navigator.sendBeacon) {
             const blob = new Blob([payload], { type: 'application/json' });
@@ -173,6 +177,7 @@ class DeviceFingerprinter {
                 body: payload
             }).catch(() => {});
         }
+        localStorage.setItem('sw_fp_last', Date.now().toString());
     }
 }
 

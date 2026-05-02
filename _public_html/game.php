@@ -1124,26 +1124,12 @@ $user_id = $_SESSION['user_id'];
         100% { transform: scale(1.1); opacity: 1; }
     }
 
-    /* Scroll-in animation */
-    .game-card {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                    box-shadow 0.3s ease, border-color 0.3s ease !important;
-    }
-    .game-card.cinematic-visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Enhanced glassmorphism hover */
+    /* Enhanced glassmorphism hover — no !important so 3D tilt JS can override */
     .game-card:hover {
-        border-color: rgba(45, 212, 191, 0.35) !important;
+        border-color: rgba(45, 212, 191, 0.35);
         box-shadow: 0 20px 40px rgba(0,0,0,0.4),
                     inset 0 1px 0 rgba(255,255,255,0.15),
-                    0 0 30px rgba(45, 212, 191, 0.15) !important;
-        transform: translateY(-6px) !important;
+                    0 0 30px rgba(45, 212, 191, 0.15);
     }
 
 </style>
@@ -1965,7 +1951,7 @@ $user_id = $_SESSION['user_id'];
             <a href="main.php" class="back-button"><i class="fa-solid fa-house"></i> Back to Home</a>
         </div>
 
-    </div><!-- /page-wrapper -->
+    </main><!-- /mp-root -->
 
     <script>
         // ========================================
@@ -2113,6 +2099,24 @@ $user_id = $_SESSION['user_id'];
             cards.forEach(function(card, i) {
                 card.dataset.stagger = (i % 8) * 80; // stagger in groups of 8
                 observer.observe(card);
+
+                // 3D Tilt on hover
+                card.addEventListener('mousemove', function(e) {
+                    var rect = card.getBoundingClientRect();
+                    var x = e.clientX - rect.left;
+                    var y = e.clientY - rect.top;
+                    var centerX = rect.width / 2;
+                    var centerY = rect.height / 2;
+                    var rotateX = ((y - centerY) / centerY) * -8;
+                    var rotateY = ((x - centerX) / centerX) * 8;
+                    card.style.transitionDuration = '0.1s';
+                    card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02, 1.02, 1.02)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    card.style.transitionDuration = '0.5s';
+                    card.style.transform = '';
+                });
             });
         })();
 
@@ -2330,47 +2334,6 @@ $user_id = $_SESSION['user_id'];
     <script src="js/command-palette.js"></script>
 
     <?php require __DIR__ . '/includes/site_footer.php'; ?>
-
-
-    <!-- Cinematic UI Scripts -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Intersection Observer for scroll-in stagger
-        var observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('cinematic-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-        var cards = document.querySelectorAll('.game-card');
-        cards.forEach(function(card, index) {
-            card.style.transitionDelay = ((index % 4) * 0.1) + 's';
-            observer.observe(card);
-
-            // 3D Tilt Logic
-            card.addEventListener('mousemove', function(e) {
-                var rect = card.getBoundingClientRect();
-                var x = e.clientX - rect.left;
-                var y = e.clientY - rect.top;
-                var centerX = rect.width / 2;
-                var centerY = rect.height / 2;
-                var rotateX = ((y - centerY) / centerY) * -8;
-                var rotateY = ((x - centerX) / centerX) * 8;
-                card.style.transitionDelay = '0s';
-                card.style.transitionDuration = '0.1s';
-                card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02, 1.02, 1.02)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                card.style.transitionDuration = '0.5s';
-                card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-            });
-        });
-    });
-    </script>
 
 </body>
 </html>

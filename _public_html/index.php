@@ -34,8 +34,8 @@ $recaptchaSiteKey = defined('RECAPTCHA_SITE_KEY') ? RECAPTCHA_SITE_KEY : '';
     <?php include 'partials/modals.php'; ?>
 
     <!-- Scripts -->
-    <script src="js/cinematic-bg.js?v=7.1" defer></script>
-    <script src="js/index-main.js?v=7.1" defer></script>
-    <script src="js/index-modal.js?v=7.1" defer></script>
+    <script src="js/cinematic-bg.js?v=<?php echo SITE_VERSION; ?>" defer></script>
+    <script src="js/index-main.js?v=<?php echo SITE_VERSION; ?>" defer></script>
+    <script src="js/index-modal.js?v=<?php echo SITE_VERSION; ?>" defer></script>
 </body>
 </html>

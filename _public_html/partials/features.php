@@ -1,11 +1,11 @@
-<section class="stats-section" id="stats">
+ï»¿<section class="stats-section" id="stats">
     <div class="stats-grid">
         <div class="stat-card reveal">
-            <div class="stat-value" id="statMembers">—</div>
+            <div class="stat-value" id="statMembers">-</div>
             <div class="stat-label">Members</div>
         </div>
         <div class="stat-card reveal">
-            <div class="stat-value" id="statGames">—</div>
+            <div class="stat-value" id="statGames">-</div>
             <div class="stat-label">Games</div>
         </div>
         <div class="stat-card reveal">
@@ -39,7 +39,12 @@
         <div class="feature-card reveal" data-feature="themes">
             <div class="feature-icon"><i class="fas fa-paint-brush"></i></div>
             <h3 class="feature-title">Custom Themes</h3>
-            <p class="feature-desc">Personalize everything — backgrounds, accent colors, and profile themes.</p>
+            <p class="feature-desc">Personalize everything - backgrounds, accent colors, and profile themes.</p>
+        </div>
+        <div class="feature-card reveal" data-feature="community">
+            <div class="feature-icon"><i class="fas fa-users"></i></div>
+            <h3 class="feature-title">Community Hub</h3>
+            <p class="feature-desc">Connect with other members, share ideas, and grow together in a vibrant community.</p>
         </div>
     </div>
 </section>
