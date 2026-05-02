@@ -1,117 +1,10 @@
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-require_once __DIR__ . '/includes/init.php';
-
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: index.php');
-    exit;
-}
-$__bgfile = __DIR__ . '/load_background_system.php';
-if (file_exists($__bgfile)) { require_once $__bgfile; }
-
-// Fetch active designer background
-$active_designer_background = null;
-$available_backgrounds = [];
-
-try {
-    require_once 'config/database.php';
-    $database = new Database();
-    $db = $database->getConnection();
-
-    // Get active designer background
-    $bgStmt = $db->query("
-        SELECT db.image_url, db.title, u.username as designer_name
-        FROM designer_backgrounds db
-        LEFT JOIN users u ON db.user_id = u.id
-        WHERE db.is_active = 1 AND db.status = 'approved'
-        LIMIT 1
-    ");
-    $active_designer_background = $bgStmt->fetch(PDO::FETCH_ASSOC);
-
-    // Get all approved backgrounds for user selection
-    $allBgStmt = $db->query("
-        SELECT db.id, db.image_url, db.title, u.username as designer_name
-        FROM designer_backgrounds db
-        LEFT JOIN users u ON db.user_id = u.id
-        WHERE db.status = 'approved'
-        ORDER BY db.is_active DESC, db.created_at DESC
-    ");
-    $available_backgrounds = $allBgStmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (Exception $e) {
-    error_log("Database fetch error: " . $e->getMessage());
-}
-
-// Get user info for display
-$username = htmlspecialchars($_SESSION['username']);
-$role = htmlspecialchars($_SESSION['role']);
-$user_id = $_SESSION['user_id'];
-?>
-
-<!doctype html>
-<html lang="en">
-<head>
-    <script src="js/tracking.js?v=7.0" defer></script>
-    <script src="js/fingerprint.js" defer></script>
-    <script src="common.js"></script>
-    <link rel="stylesheet" href="control_buttons.css">
-    <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
-
-    <link rel="icon" href="/assets/images/favicon.webp">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore Spencer's Game Collection - HTML5 games and entertainment">
-    <title>Game Collection - Spencer's Website</title>
-    <link rel="stylesheet" href="css/tokens.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="css/command-palette.css">
-<link rel="stylesheet" href="games/css/game-page.css">
-</head>
-<body data-backgrounds='<?php echo htmlspecialchars(json_encode($available_backgrounds), ENT_QUOTES, 'UTF-8'); ?>'
-      data-cinematic-bg="dim"
-      data-active-background='<?php echo htmlspecialchars($active_designer_background['image_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>'>
-    <?php require_once __DIR__ . '/includes/identity_bar_v2.php'; ?>
-    <!-- Background Theme Override Element -->
-    <div class="bg-theme-override" id="bgThemeOverride"></div>
-
-    <!-- Background Selection Modal -->
-    <div id="backgroundModal" class="background-modal">
-        <div class="background-modal-content">
-            <div class="background-modal-header">
-                <h2 class="background-modal-title"><i class="fa-solid fa-palette"></i> Choose Your Background</h2>
-                <button class="background-modal-close" onclick="closeBackgroundModal()">&times;</button>
-            </div>
-
-            <div class="backgrounds-grid" id="backgroundsGrid">
-                <!-- Background items will be populated by JavaScript -->
-            </div>
-
-            <div style="text-align: center; margin-top: 2rem;">
-                <button class="btn-remove-background" onclick="removeCustomBackground()" style="padding: 12px 24px; font-size: 1rem;">
-                    <i class="fa-solid fa-trash"></i> Remove Custom Background
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <main id="mainContent" class="mp-root" role="main">
-
-        <!-- Back Link -->
-        <a href="main.php" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
-
-        <?php require __DIR__ . '/games/sections/header.php'; ?>
-
-        <?php require __DIR__ . '/games/sections/filters.php'; ?>
-
-        <!-- ========================================
+<!-- ========================================
              Games Grid
              ======================================== -->
         <div class="games-grid" id="gamesGrid">
 
             <!-- Tomb of the Mask -->
-            <div class="game-card" data-category="arcade" data-title="Tomb of the Mask" data-popularity="95">
+            <div class="mp-card game-card" data-category="arcade" data-title="Tomb of the Mask" data-popularity="95">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#127919;</span>
@@ -125,7 +18,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- CS:GO Clicker -->
-            <div class="game-card" data-category="strategy" data-title="CS:GO Clicker" data-popularity="78">
+            <div class="mp-card game-card" data-category="strategy" data-title="CS:GO Clicker" data-popularity="78">
                 <div class="card-thumb">
                     <span>&#128433;</span>
                 </div>
@@ -138,7 +31,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Basketball Io -->
-            <div class="game-card" data-category="strategy" data-title="Basketball Io" data-popularity="70">
+            <div class="mp-card game-card" data-category="strategy" data-title="Basketball Io" data-popularity="70">
                 <div class="card-thumb">
                     <span>&#127936;</span>
                 </div>
@@ -151,7 +44,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Block Blast Adventure -->
-            <div class="game-card" data-category="fix" data-title="Block Blast Adventure" data-popularity="72">
+            <div class="mp-card game-card" data-category="fix" data-title="Block Blast Adventure" data-popularity="72">
                 <div class="card-thumb">
                     <span>&#129513;</span>
                 </div>
@@ -164,7 +57,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Slope Runner -->
-            <div class="game-card" data-category="arcade" data-title="Slope Runner" data-popularity="88">
+            <div class="mp-card game-card" data-category="arcade" data-title="Slope Runner" data-popularity="88">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#9975;</span>
@@ -178,7 +71,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Mortal Kombat -->
-            <div class="game-card" data-category="action" data-title="Mortal Kombat" data-popularity="90">
+            <div class="mp-card game-card" data-category="action" data-title="Mortal Kombat" data-popularity="90">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#129355;</span>
@@ -192,7 +85,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Cookie Clicker -->
-            <div class="game-card" data-category="strategy" data-title="Cookie Clicker" data-popularity="82">
+            <div class="mp-card game-card" data-category="strategy" data-title="Cookie Clicker" data-popularity="82">
                 <div class="card-thumb">
                     <span>&#127850;</span>
                 </div>
@@ -205,7 +98,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Granny -->
-            <div class="game-card" data-category="horror" data-title="Granny" data-popularity="85">
+            <div class="mp-card game-card" data-category="horror" data-title="Granny" data-popularity="85">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128682;</span>
@@ -219,7 +112,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Retro Bowl -->
-            <div class="game-card" data-category="arcade" data-title="Retro Bowl" data-popularity="96">
+            <div class="mp-card game-card" data-category="arcade" data-title="Retro Bowl" data-popularity="96">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-crown"></i> TOP</div>
                     <span>&#127944;</span>
@@ -233,7 +126,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Retro Bowl College -->
-            <div class="game-card" data-category="arcade" data-title="Retro Bowl College" data-popularity="89">
+            <div class="mp-card game-card" data-category="arcade" data-title="Retro Bowl College" data-popularity="89">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#127944;</span>
@@ -247,7 +140,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Geometry Dash LITE -->
-            <div class="game-card" data-category="arcade" data-title="Geometry Dash LITE" data-popularity="91">
+            <div class="mp-card game-card" data-category="arcade" data-title="Geometry Dash LITE" data-popularity="91">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128313;</span>
@@ -261,7 +154,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Awesome Tank 2 -->
-            <div class="game-card" data-category="FIXED" data-title="Awesome Tank 2" data-popularity="74">
+            <div class="mp-card game-card" data-category="FIXED" data-title="Awesome Tank 2" data-popularity="74">
                 <div class="card-thumb">
                     <span>&#128668;</span>
                 </div>
@@ -274,7 +167,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- FNAF 1 -->
-            <div class="game-card" data-category="fnaf" data-title="Five Night's Of Freddy's" data-popularity="92">
+            <div class="mp-card game-card" data-category="fnaf" data-title="Five Night's Of Freddy's" data-popularity="92">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128059;</span>
@@ -288,7 +181,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Super Mario 64 -->
-            <div class="game-card" data-category="arcade" data-title="Super Mario 64" data-popularity="93">
+            <div class="mp-card game-card" data-category="arcade" data-title="Super Mario 64" data-popularity="93">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-crown"></i> TOP</div>
                     <span>&#127812;</span>
@@ -302,7 +195,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Ragdoll Archers -->
-            <div class="game-card" data-category="strategy" data-title="Ragdoll Archers" data-popularity="76">
+            <div class="mp-card game-card" data-category="strategy" data-title="Ragdoll Archers" data-popularity="76">
                 <div class="card-thumb">
                     <span>&#127993;</span>
                 </div>
@@ -315,7 +208,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Final Earth 2 -->
-            <div class="game-card" data-category="strategy" data-title="Final Earth 2" data-popularity="73">
+            <div class="mp-card game-card" data-category="strategy" data-title="Final Earth 2" data-popularity="73">
                 <div class="card-thumb">
                     <span>&#127759;</span>
                 </div>
@@ -328,7 +221,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Doom -->
-            <div class="game-card" data-category="arcade" data-title="Doom" data-popularity="94">
+            <div class="mp-card game-card" data-category="arcade" data-title="Doom" data-popularity="94">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-crown"></i> TOP</div>
                     <span>&#128128;</span>
@@ -342,7 +235,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Funny Battle 2 -->
-            <div class="game-card" data-category="arcade" data-title="Funny Battle 2" data-popularity="71">
+            <div class="mp-card game-card" data-category="arcade" data-title="Funny Battle 2" data-popularity="71">
                 <div class="card-thumb">
                     <span>&#9876;</span>
                 </div>
@@ -355,7 +248,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Baldi Basics -->
-            <div class="game-card" data-category="arcade" data-title="Baldi Basics" data-popularity="80">
+            <div class="mp-card game-card" data-category="arcade" data-title="Baldi Basics" data-popularity="80">
                 <div class="card-thumb">
                     <span>&#128207;</span>
                 </div>
@@ -368,7 +261,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Chess (BROKEN) -->
-            <div class="game-card" data-category="broke" data-title="Chess" data-popularity="60">
+            <div class="mp-card game-card" data-category="broke" data-title="Chess" data-popularity="60">
                 <div class="card-thumb">
                     <span>&#9823;</span>
                 </div>
@@ -381,7 +274,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Pre-Civilization Bronze Age -->
-            <div class="game-card" data-category="strategy" data-title="Pre-Civilization Bronze Age" data-popularity="69">
+            <div class="mp-card game-card" data-category="strategy" data-title="Pre-Civilization Bronze Age" data-popularity="69">
                 <div class="card-thumb">
                     <span>&#127918;</span>
                 </div>
@@ -394,7 +287,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Territorial.io -->
-            <div class="game-card" data-category="strategy" data-title="Territorial.io" data-popularity="83">
+            <div class="mp-card game-card" data-category="strategy" data-title="Territorial.io" data-popularity="83">
                 <div class="card-thumb">
                     <span>&#127758;</span>
                 </div>
@@ -407,7 +300,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Friday Night Funkin -->
-            <div class="game-card" data-category="action" data-title="Friday Night Funkin" data-popularity="87">
+            <div class="mp-card game-card" data-category="action" data-title="Friday Night Funkin" data-popularity="87">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#127908;</span>
@@ -421,7 +314,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Bitlife -->
-            <div class="game-card" data-category="strategy" data-title="Bitlife" data-popularity="81">
+            <div class="mp-card game-card" data-category="strategy" data-title="Bitlife" data-popularity="81">
                 <div class="card-thumb">
                     <span>&#128100;</span>
                 </div>
@@ -434,7 +327,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Time Shooters 2 -->
-            <div class="game-card" data-category="action" data-title="Time Shooters 2" data-popularity="84">
+            <div class="mp-card game-card" data-category="action" data-title="Time Shooters 2" data-popularity="84">
                 <div class="card-thumb">
                     <span>&#128296;</span>
                 </div>
@@ -447,7 +340,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Rooftop Snipers -->
-            <div class="game-card" data-category="action" data-title="Rooftop Snipers" data-popularity="79">
+            <div class="mp-card game-card" data-category="action" data-title="Rooftop Snipers" data-popularity="79">
                 <div class="card-thumb">
                     <span>&#128299;</span>
                 </div>
@@ -460,7 +353,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Tunnel Rush -->
-            <div class="game-card" data-category="action" data-title="Tunnel Rush" data-popularity="86">
+            <div class="mp-card game-card" data-category="action" data-title="Tunnel Rush" data-popularity="86">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128647;</span>
@@ -474,7 +367,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Subway Surfers -->
-            <div class="game-card" data-category="arcade" data-title="Subway Surfers" data-popularity="94">
+            <div class="mp-card game-card" data-category="arcade" data-title="Subway Surfers" data-popularity="94">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-crown"></i> TOP</div>
                     <span>&#128646;</span>
@@ -488,7 +381,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Gun Mayhem 2 -->
-            <div class="game-card" data-category="action" data-title="Gun Mayhem 2" data-popularity="77">
+            <div class="mp-card game-card" data-category="action" data-title="Gun Mayhem 2" data-popularity="77">
                 <div class="card-thumb">
                     <span>&#128299;</span>
                 </div>
@@ -501,7 +394,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Bad Parenting -->
-            <div class="game-card" data-category="fix" data-title="Bad Parenting" data-popularity="75">
+            <div class="mp-card game-card" data-category="fix" data-title="Bad Parenting" data-popularity="75">
                 <div class="card-thumb">
                     <span>&#128123;</span>
                 </div>
@@ -514,7 +407,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Baseball Bros -->
-            <div class="game-card" data-category="arcade" data-title="Baseball Bros" data-popularity="72">
+            <div class="mp-card game-card" data-category="arcade" data-title="Baseball Bros" data-popularity="72">
                 <div class="card-thumb">
                     <span>&#9918;</span>
                 </div>
@@ -527,7 +420,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Crazy Cattle 3D -->
-            <div class="game-card" data-category="action" data-title="Crazy Cattle 3D" data-popularity="97">
+            <div class="mp-card game-card" data-category="action" data-title="Crazy Cattle 3D" data-popularity="97">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-crown"></i> #1</div>
                     <span>&#128004;</span>
@@ -541,7 +434,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Eggy Car -->
-            <div class="game-card" data-category="arcade" data-title="Eggy Car" data-popularity="74">
+            <div class="mp-card game-card" data-category="arcade" data-title="Eggy Car" data-popularity="74">
                 <div class="card-thumb">
                     <span>&#129370;</span>
                 </div>
@@ -554,7 +447,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Paper.io -->
-            <div class="game-card" data-category="fix" data-title="Paper.io" data-popularity="80">
+            <div class="mp-card game-card" data-category="fix" data-title="Paper.io" data-popularity="80">
                 <div class="card-thumb">
                     <span>&#128196;</span>
                 </div>
@@ -567,7 +460,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- FNAF 2 -->
-            <div class="game-card" data-category="fnaf" data-title="FNAF 2" data-popularity="90">
+            <div class="mp-card game-card" data-category="fnaf" data-title="FNAF 2" data-popularity="90">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128059;</span>
@@ -581,7 +474,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- FNAF 3 -->
-            <div class="game-card" data-category="fnaf" data-title="FNAF 3" data-popularity="88">
+            <div class="mp-card game-card" data-category="fnaf" data-title="FNAF 3" data-popularity="88">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128059;</span>
@@ -595,7 +488,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- FNAF 4 -->
-            <div class="game-card" data-category="fnaf" data-title="FNAF 4" data-popularity="87">
+            <div class="mp-card game-card" data-category="fnaf" data-title="FNAF 4" data-popularity="87">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128059;</span>
@@ -609,7 +502,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- 1v1.LOL -->
-            <div class="game-card" data-category="fix" data-title="1v1.LOL" data-popularity="91">
+            <div class="mp-card game-card" data-category="fix" data-title="1v1.LOL" data-popularity="91">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
                     <span>&#128299;</span>
@@ -623,7 +516,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Funny Shooter 2 -->
-            <div class="game-card" data-category="action" data-title="Funny Shooter 2" data-popularity="82">
+            <div class="mp-card game-card" data-category="action" data-title="Funny Shooter 2" data-popularity="82">
                 <div class="card-thumb">
                     <span>&#128299;</span>
                 </div>
@@ -636,7 +529,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Snow Rider 3D -->
-            <div class="game-card" data-category="arcade" data-title="Snow Rider 3D" data-popularity="79">
+            <div class="mp-card game-card" data-category="arcade" data-title="Snow Rider 3D" data-popularity="79">
                 <div class="card-thumb">
                     <span>&#127938;</span>
                 </div>
@@ -649,7 +542,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Super Mario Bros -->
-            <div class="game-card" data-category="arcade" data-title="Super Mario Bros" data-popularity="95">
+            <div class="mp-card game-card" data-category="arcade" data-title="Super Mario Bros" data-popularity="95">
                 <div class="card-thumb">
                     <div class="popularity"><i class="fa-solid fa-crown"></i> TOP</div>
                     <span>&#127812;</span>
@@ -663,7 +556,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Time Shooter 1 -->
-            <div class="game-card" data-category="fix" data-title="Time Shooter 1" data-popularity="78">
+            <div class="mp-card game-card" data-category="fix" data-title="Time Shooter 1" data-popularity="78">
                 <div class="card-thumb">
                     <span>&#128336;</span>
                 </div>
@@ -676,7 +569,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Time Shooter 3: SWAT -->
-            <div class="game-card" data-category="action" data-title="Time Shooter 3 SWAT" data-popularity="83">
+            <div class="mp-card game-card" data-category="action" data-title="Time Shooter 3 SWAT" data-popularity="83">
                 <div class="card-thumb">
                     <span>&#128336;</span>
                 </div>
@@ -689,7 +582,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Solar Smash (NEW!) -->
-            <div class="game-card" data-category="action" data-title="Solar Smash" data-popularity="88" data-new="true">
+            <div class="mp-card game-card" data-category="action" data-title="Solar Smash" data-popularity="88" data-new="true">
                 <div class="card-thumb">
                     <div class="ribbon-new">NEW!</div>
                     <div class="popularity"><i class="fa-solid fa-fire"></i> HOT</div>
@@ -704,7 +597,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Idle Breakout (NEW!) -->
-            <div class="game-card" data-category="action" data-title="Idle Breakout" data-popularity="76" data-new="true">
+            <div class="mp-card game-card" data-category="action" data-title="Idle Breakout" data-popularity="76" data-new="true">
                 <div class="card-thumb">
                     <div class="ribbon-new">NEW!</div>
                     <span>&#127919;</span>
@@ -718,7 +611,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Speed Stars (NEW!) -->
-            <div class="game-card" data-category="broke" data-title="Speed Stars" data-popularity="65" data-new="true">
+            <div class="mp-card game-card" data-category="broke" data-title="Speed Stars" data-popularity="65" data-new="true">
                 <div class="card-thumb">
                     <div class="ribbon-new">NEW!</div>
                     <span>&#127939;</span>
@@ -732,7 +625,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- Poly Track (NEW!) -->
-            <div class="game-card" data-category="action" data-title="Poly Track" data-popularity="82" data-new="true">
+            <div class="mp-card game-card" data-category="action" data-title="Poly Track" data-popularity="82" data-new="true">
                 <div class="card-thumb">
                     <div class="ribbon-new">NEW!</div>
                     <span>&#128663;</span>
@@ -746,7 +639,7 @@ $user_id = $_SESSION['user_id'];
             </div>
 
             <!-- More Games Coming -->
-            <div class="game-card" data-category="all" data-title="More Games Coming" data-popularity="0">
+            <div class="mp-card game-card" data-category="all" data-title="More Games Coming" data-popularity="0">
                 <div class="card-thumb" style="background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(45,212,191,0.15));">
                     <span>&#128640;</span>
                 </div>
@@ -764,371 +657,4 @@ $user_id = $_SESSION['user_id'];
             <a href="main.php" class="back-button"><i class="fa-solid fa-house"></i> Back to Home</a>
         </div>
 
-    </div><!-- /page-wrapper -->
-
-    <script>
-        // ========================================
-        // Hero Carousel
-        // ========================================
-        (function() {
-            const cards = document.querySelectorAll('.hero-card');
-            const dots  = document.querySelectorAll('.carousel-dot');
-            let current = 0;
-            let interval;
-
-            function goTo(idx) {
-                cards[current].classList.remove('active');
-                dots[current].classList.remove('active');
-                current = idx;
-                cards[current].classList.add('active');
-                dots[current].classList.add('active');
-            }
-
-            function next() { goTo((current + 1) % cards.length); }
-
-            function startAuto() { interval = setInterval(next, 5000); }
-            function stopAuto()  { clearInterval(interval); }
-
-            dots.forEach(dot => {
-                dot.addEventListener('click', function() {
-                    stopAuto();
-                    goTo(parseInt(this.dataset.dot));
-                    startAuto();
-                });
-            });
-
-            startAuto();
-        })();
-
-        // ========================================
-        // Search
-        // ========================================
-        (function() {
-            const input   = document.getElementById('gameSearch');
-            const clear   = document.getElementById('searchClear');
-            const grid    = document.getElementById('gamesGrid');
-            const noRes   = document.getElementById('noResults');
-
-            function filterBySearch() {
-                const q = input.value.trim().toLowerCase();
-                clear.classList.toggle('visible', q.length > 0);
-
-                const cards = grid.querySelectorAll('.game-card');
-                let visibleCount = 0;
-                const activeTab = document.querySelector('.category-tab.active');
-                const activeCat = activeTab ? activeTab.dataset.category : 'all';
-
-                cards.forEach(card => {
-                    const title = (card.dataset.title || '').toLowerCase();
-                    const cat   = card.dataset.category || '';
-                    const matchSearch = !q || title.includes(q);
-                    const matchCat = activeCat === 'all' || cat === activeCat;
-
-                    if (matchSearch && matchCat) {
-                        card.style.display = '';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                noRes.style.display = visibleCount === 0 ? 'block' : 'none';
-            }
-
-            input.addEventListener('input', filterBySearch);
-
-            clear.addEventListener('click', function() {
-                input.value = '';
-                clear.classList.remove('visible');
-                filterBySearch();
-                input.focus();
-            });
-
-            // Expose for category tabs
-            window._filterBySearch = filterBySearch;
-        })();
-
-        // ========================================
-        // Category Tabs with Count Badges
-        // ========================================
-        (function() {
-            const tabs  = document.querySelectorAll('.category-tab');
-            const cards = document.querySelectorAll('.game-card');
-
-            // Populate count badges
-            const counts = {};
-            let total = 0;
-            cards.forEach(card => {
-                const cat = card.dataset.category;
-                if (!cat) return;
-                // Don't count the "More Games Coming" placeholder
-                if (card.dataset.title === 'More Games Coming') return;
-                counts[cat] = (counts[cat] || 0) + 1;
-                total++;
-            });
-
-            const allCount = document.getElementById('count-all');
-            if (allCount) allCount.textContent = total;
-
-            Object.keys(counts).forEach(cat => {
-                const el = document.getElementById('count-' + cat);
-                if (el) el.textContent = counts[cat];
-            });
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-
-                    // Re-run search filter (which also respects category)
-                    if (window._filterBySearch) window._filterBySearch();
-                });
-            });
-        })();
-
-        // ========================================
-        // IntersectionObserver Stagger Animation
-        // ========================================
-        (function() {
-            const cards = document.querySelectorAll('.game-card');
-            let delay = 0;
-
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        const card = entry.target;
-                        const stagger = parseInt(card.dataset.stagger || '0');
-                        card.style.transitionDelay = stagger + 'ms';
-                        card.style.transition = 'opacity 0.5s ease ' + stagger + 'ms, transform 0.5s ease ' + stagger + 'ms';
-                        card.classList.add('visible');
-                        observer.unobserve(card);
-                    }
-                });
-            }, {
-                threshold: 0.08,
-                rootMargin: '0px 0px -40px 0px'
-            });
-
-            cards.forEach(function(card, i) {
-                card.dataset.stagger = (i % 8) * 80; // stagger in groups of 8
-                observer.observe(card);
-            });
-        })();
-
-        // ========================================
-        // Logout
-        // ========================================
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                const logoutBtn = document.querySelector('.logout-btn');
-                const originalText = logoutBtn.innerHTML;
-                logoutBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging out...';
-                logoutBtn.disabled = true;
-
-                fetch('auth/logout.php')
-                    .then(response => {
-                        if (response.ok) {
-                            logoutBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
-                            setTimeout(() => { window.location.href = 'index.php'; }, 1000);
-                        } else {
-                            throw new Error('Logout failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Logout error:', error);
-                        logoutBtn.innerHTML = originalText;
-                        logoutBtn.disabled = false;
-                        alert('Logout failed. Please try again.');
-                    });
-            }
-        }
-
-        // ========================================
-        // Background Selection Functionality
-        // ========================================
-        function openBackgroundModal() {
-            const modal = document.getElementById('backgroundModal');
-            const grid = document.getElementById('backgroundsGrid');
-            grid.innerHTML = '';
-
-            const backgrounds = <?php echo json_encode($available_backgrounds); ?>;
-            const currentBackground = getCurrentBackground();
-
-            backgrounds.forEach(background => {
-                const isActive = currentBackground === background.image_url;
-
-                const backgroundItem = document.createElement('div');
-                backgroundItem.className = 'background-item' + (isActive ? ' active' : '');
-                backgroundItem.innerHTML =
-                    '<div class="background-preview" style="background-image: url(\'' + background.image_url + '\')"></div>' +
-                    '<div class="background-info">' +
-                        '<div class="background-title">' + escapeHtml(background.title) + '</div>' +
-                        '<div class="background-designer">By: ' + escapeHtml(background.designer_name) + '</div>' +
-                        '<div class="background-actions">' +
-                            '<button class="btn-set-background" onclick="setAsBackground(\'' + background.image_url + '\', \'' + escapeHtml(background.title) + '\')">' +
-                                (isActive ? '<i class="fa-solid fa-check"></i> Using' : 'Use This') +
-                            '</button>' +
-                        '</div>' +
-                    '</div>';
-
-                grid.appendChild(backgroundItem);
-            });
-
-            modal.style.display = 'block';
-        }
-
-        function closeBackgroundModal() {
-            document.getElementById('backgroundModal').style.display = 'none';
-        }
-
-        function setAsBackground(imageUrl, title) {
-            let settings = JSON.parse(localStorage.getItem('spencerWebsiteSettings') || '{}');
-            settings.customBackground = imageUrl;
-            settings.customBackgroundTitle = title;
-            localStorage.setItem('spencerWebsiteSettings', JSON.stringify(settings));
-
-            applyActiveBackground();
-            closeBackgroundModal();
-            showNotification('Background set to "' + title + '"!');
-            setTimeout(openBackgroundModal, 100);
-        }
-
-        function removeCustomBackground() {
-            let settings = JSON.parse(localStorage.getItem('spencerWebsiteSettings') || '{}');
-            delete settings.customBackground;
-            delete settings.customBackgroundTitle;
-            localStorage.setItem('spencerWebsiteSettings', JSON.stringify(settings));
-
-            applyActiveBackground();
-            closeBackgroundModal();
-            showNotification('Custom background removed!');
-            setTimeout(openBackgroundModal, 100);
-        }
-
-        function getCurrentBackground() {
-            const savedSettings = localStorage.getItem('spencerWebsiteSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                return settings.customBackground || null;
-            }
-            return null;
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText =
-                'position:fixed;top:20px;right:20px;' +
-                'background:linear-gradient(135deg,#2dd4bf,#06b6d4);' +
-                'color:#0f172a;padding:15px 20px;border-radius:8px;' +
-                'box-shadow:0 5px 15px rgba(0,0,0,0.3);z-index:10001;' +
-                'font-weight:600;transform:translateX(400px);transition:transform 0.3s ease;';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(function() { notification.style.transform = 'translateX(0)'; }, 100);
-            setTimeout(function() {
-                notification.style.transform = 'translateX(400px)';
-                setTimeout(function() { document.body.removeChild(notification); }, 300);
-            }, 3000);
-        }
-
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // ========================================
-        // Apply Active Background
-        // ========================================
-        function applyActiveBackground() {
-            const bgOverride = document.getElementById('bgThemeOverride');
-            if (!bgOverride) return;
-
-            const savedSettings = localStorage.getItem('spencerWebsiteSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                if (settings.customBackground && settings.customBackground.trim() !== '') {
-                    bgOverride.style.backgroundImage = "url('" + settings.customBackground + "')";
-                    bgOverride.classList.remove('designer-bg');
-                    return;
-                }
-            }
-
-            <?php if ($active_designer_background): ?>
-                bgOverride.style.backgroundImage = "url('<?php echo htmlspecialchars($active_designer_background['image_url'], ENT_QUOTES); ?>')";
-                bgOverride.classList.add('designer-bg');
-            <?php endif; ?>
-        }
-
-        // ========================================
-        // DOMContentLoaded - Settings & Init
-        // ========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedSettings = localStorage.getItem('spencerWebsiteSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-
-                if (settings.accentColor) {
-                    const accentColor = '#' + settings.accentColor;
-
-                    let styleElement = document.getElementById('accent-color-styles');
-                    if (!styleElement) {
-                        styleElement = document.createElement('style');
-                        styleElement.id = 'accent-color-styles';
-                        document.head.appendChild(styleElement);
-                    }
-
-                    styleElement.textContent =
-                        '.game-button, .move-button, .info-button { background: linear-gradient(135deg, ' + accentColor + ', #06b6d4) !important; }' +
-                        '.game-button:hover, .move-button:hover, .info-button:hover { background: linear-gradient(135deg, #06b6d4, ' + accentColor + ') !important; }' +
-                        '.back-link { border-color: ' + accentColor + ' !important; }' +
-                        '.back-link:hover { border-color: ' + accentColor + ' !important; color: ' + accentColor + ' !important; }' +
-                        '.back-button { background: linear-gradient(135deg, ' + accentColor + ', #7c3aed) !important; }' +
-                        '.game-card:hover { border-color: rgba(255,255,255,0.2) !important; }' +
-                        '.page-header h1 { background: linear-gradient(135deg, ' + accentColor + ', #a78bfa, #f97171) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; }' +
-                        '.page-header::before { background: linear-gradient(135deg, ' + accentColor + ', #a78bfa, #f97171) !important; }' +
-                        '.category-tab.active { background: linear-gradient(135deg, ' + accentColor + ', #06b6d4) !important; }' +
-                        '.hero-play-btn { background: linear-gradient(135deg, ' + accentColor + ', #06b6d4) !important; }';
-                }
-
-                if (settings.fontSize) {
-                    document.documentElement.style.fontSize = settings.fontSize + 'px';
-                }
-
-                if (settings.gameVolume) {
-                    console.log('Game volume set to:', settings.gameVolume);
-                }
-            }
-
-            applyActiveBackground();
-        });
-
-        function comingSoon() {
-            alert('More exciting games are coming soon! Stay tuned for updates.');
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('backgroundModal');
-            if (event.target === modal) { closeBackgroundModal(); }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'l') { e.preventDefault(); logout(); }
-            if (e.ctrlKey && e.key === 's') { e.preventDefault(); window.location.href = 'set.php'; }
-            if (e.ctrlKey && e.key === 'b') { e.preventDefault(); openBackgroundModal(); }
-        });
-    </script>
-
-    <!-- Command Palette -->
-    <script src="js/command-palette.js"></script>
-
-    <?php require __DIR__ . '/includes/site_footer.php'; ?>
-
-</body>
-</html>
+    </div>
