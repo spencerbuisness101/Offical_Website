@@ -27,7 +27,7 @@ jobs:
         # Try push first (fast, incremental). Fall back to init (full upload) on first run.
         git ftp push \
           --syncroot _public_html/ \
-          --remote-root / \
+          --remote-root /public_html/ \
           --user "$FTP_USERNAME" \
           --passwd "$FTP_PASSWORD" \
           "ftp://$FTP_SERVER" \
@@ -36,7 +36,7 @@ jobs:
           echo "--- git ftp push failed, running init (full upload) ---"
           git ftp init \
             --syncroot _public_html/ \
-            --remote-root / \
+            --remote-root /public_html/ \
             --user "$FTP_USERNAME" \
             --passwd "$FTP_PASSWORD" \
             "ftp://$FTP_SERVER" \
