@@ -725,8 +725,13 @@
                     if (typeof openCommunityModal === 'function') openCommunityModal(e);
                     break;
                 case 'compare-modal':
+                case 'open-compare-modal':
                     e.preventDefault();
                     if (typeof openCompareModal === 'function') openCompareModal(e);
+                    break;
+                case 'close-compare-modal':
+                    e.preventDefault();
+                    if (typeof closeCompareModal === 'function') closeCompareModal();
                     break;
                 case 'create-guest':
                     e.preventDefault();

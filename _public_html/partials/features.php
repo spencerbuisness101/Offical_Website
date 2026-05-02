@@ -1,4 +1,4 @@
-﻿<section class="stats-section" id="stats">
+<section class="stats-section" id="stats">
     <div class="stats-grid">
         <div class="stat-card reveal">
             <div class="stat-value" id="statMembers">-</div>
@@ -45,6 +45,16 @@
             <div class="feature-icon"><i class="fas fa-users"></i></div>
             <h3 class="feature-title">Community Hub</h3>
             <p class="feature-desc">Connect with other members, share ideas, and grow together in a vibrant community.</p>
+        </div>
+        <div class="feature-card reveal" data-feature="cloud">
+            <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+            <h3 class="feature-title">Cloud Progress</h3>
+            <p class="feature-desc">Pick up where you left off. Your game data and settings sync across all devices.</p>
+        </div>
+        <div class="feature-card reveal" data-feature="rankings">
+            <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+            <h3 class="feature-title">Global Rankings</h3>
+            <p class="feature-desc">Compete on the world stage. See how you stack up in our real-time leaderboards.</p>
         </div>
     </div>
 </section>

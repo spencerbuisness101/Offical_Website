@@ -32,8 +32,8 @@
         <div class="pricing-card card-yearly reveal">
             <i class="fas fa-crown yearly-crown"></i>
             <div class="yearly-badges">
-                <span class="yearly-badge popular">? Most Popular</span>
-                <span class="yearly-badge savings">Save 11%</span>
+                <span class="yearly-badge popular">★ Most Popular</span>
+                <span class="yearly-badge savings">Save <span id="yearlySavings">$0</span></span>
             </div>
             <div class="pricing-name">Premium Yearly</div>
             <div class="yearly-price-wrap">
@@ -47,6 +47,24 @@
                 <li>Priority support</li>
             </ul>
             <a href="shop.php?plan=yearly" class="pricing-cta ripple-container">Get Yearly</a>
+        </div>
+        <div class="pricing-card card-lifetime reveal">
+            <div class="pricing-name"><i class="fas fa-gem tier-icon"></i> Premium Lifetime</div>
+            <div class="pricing-price">$100</div>
+            <div class="pricing-subprice">One-time payment</div>
+            <ul class="pricing-features">
+                <li>Everything in Yearly</li>
+                <li>Permanent access</li>
+                <li>Lifetime OG badge</li>
+                <li>VIP beta access</li>
+            </ul>
+            <a href="shop.php?plan=lifetime" class="pricing-cta ripple-container">Get Lifetime</a>
+        </div>
+        <div class="pricing-card card-bonus reveal" data-action="open-compare-modal">
+            <div class="bonus-icon"><i class="fas fa-layer-group"></i></div>
+            <div class="bonus-title">Compare Plans</div>
+            <div class="bonus-desc">View a side-by-side breakdown of all features and benefits.</div>
+            <button class="pricing-cta ripple-container">Compare All →</button>
         </div>
     </div>
 </section>

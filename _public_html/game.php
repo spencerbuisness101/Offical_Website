@@ -66,11 +66,11 @@ $user_id = $_SESSION['user_id'];
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/command-palette.css">
-    <link rel="stylesheet" href="css/cinematic-bg.css?v=7.1">
-    <link rel="stylesheet" href="main/css/main-page.css?v=7.1">
+    <link rel="stylesheet" href="css/cinematic-bg.css?v=<?php echo SITE_VERSION; ?>">
+    <link rel="stylesheet" href="main/css/main-page.css?v=<?php echo SITE_VERSION; ?>">
 
-    <!-- v7.1 Cinematic background module -->
-    <script src="js/cinematic-bg.js?v=7.1" defer></script>
+    <!-- Cinematic background module -->
+    <script src="js/cinematic-bg.js?v=<?php echo SITE_VERSION; ?>" defer></script>
 <style>
     body {
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -1122,6 +1122,34 @@ $user_id = $_SESSION['user_id'];
     @keyframes pulse-glow {
         0% { transform: scale(0.9); opacity: 0.5; }
         100% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Floating animation for hero cards */
+    @keyframes hero-float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .hero-card.active .hero-card-inner {
+        animation: hero-float 5s ease-in-out infinite;
+    }
+
+    /* Layout spacing fixes */
+    .hero-carousel {
+        margin-bottom: 60px !important;
+    }
+    .search-container {
+        margin-bottom: 35px !important;
+        z-index: 10;
+        position: relative;
+    }
+    .category-tabs {
+        margin-bottom: 50px !important;
+        z-index: 5;
+    }
+    .games-grid {
+        padding-top: 10px;
     }
 
     /* Enhanced glassmorphism hover — no !important so 3D tilt JS can override */
