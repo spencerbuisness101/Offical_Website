@@ -1,7 +1,8 @@
 <section class="hero">
-    <div class="hero-eyebrow">
+    <div class="hero-eyebrow reveal">
         <span class="pulse-dot"></span>
-        <span>Now in v7.4 - Cinematic UI Overhaul</span>
+        <span class="version-badge">v7.0 Stable</span>
+        <span>Now in v7.0 - Cinematic UI Overhaul</span>
     </div>
     <h1 class="hero-headline" id="heroHeadline" data-text="Your Digital Universe Awaits"></h1>
     <p class="hero-sub">Games, AI chat, and a thriving community - all in one immersive platform built for enthusiasts.</p>

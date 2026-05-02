@@ -65,9 +65,9 @@ try {
     // Seeded fallback: if DB returns 0, show a plausible random number (10-100)
     // so the landing page never displays embarrassing zeros. Cached for stability.
     $isSeeded = false;
-    if ($members === 0) { $members = random_int(40, 100); $isSeeded = true; }
-    if ($games === 0)   { $games   = random_int(10, 35);  $isSeeded = true; }
-    if ($onlineNow === 0) { $onlineNow = random_int(10, 40); $isSeeded = true; }
+    if ($members === 0) { $members = random_int(90, 150); $isSeeded = true; }
+    if ($games === 0)   { $games   = random_int(50, 75);  $isSeeded = true; }
+    if ($onlineNow === 0) { $onlineNow = random_int(20, 60); $isSeeded = true; }
 
     $result = json_encode([
         'success' => true,
@@ -89,9 +89,9 @@ try {
     error_log("Public Stats API Error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'members' => random_int(40, 100),
-        'games' => random_int(10, 35),
-        'online_now' => random_int(10, 40),
+        'members' => random_int(90, 150),
+        'games' => random_int(50, 75),
+        'online_now' => random_int(20, 60),
         'is_seeded' => true
     ]);
 }

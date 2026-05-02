@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Spencer's Website — Design Tokens v7.0
  */
 :root {
@@ -190,6 +190,25 @@
     cursor: pointer;
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
+/* --- CUSTOM CURSOR SYSTEM --- */
+.cursor-dot {
+    position: fixed; width: 12px; height: 12px;
+    background: var(--teal); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px var(--teal), 0 0 30px rgba(29,255,196,0.3);
+    transition: transform 0.15s var(--ease-out), background 0.3s ease;
+    mix-blend-mode: exclusion;
+}
+.cursor-dot.active { transform: translate(-50%, -50%) scale(2.5); background: var(--accent); box-shadow: 0 0 20px var(--accent); }
+.cursor-outline {
+    position: fixed; width: 40px; height: 40px;
+    border: 1px solid rgba(255,255,255,0.2); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s var(--ease-out);
+}
+.cursor-outline.active { width: 60px; height: 60px; border-color: var(--accent-soft); background: rgba(123,110,246,0.05); }
 .chip:hover, .chip.active { color: var(--accent-soft); border: var(--border-violet); background: var(--accent-halo); }
 .divider { border: none; height: 0; border-top: var(--border-subtle); margin: var(--space-5) 0; }
 .title-xl { font-size: clamp(34px, 5.5vw, 54px); font-weight: 200; letter-spacing: -0.02em; line-height: 1.1; }

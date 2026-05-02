@@ -4,8 +4,8 @@
             <div class="stat-icon-wrap"><i class="fas fa-users"></i></div>
             <div class="stat-content">
                 <div class="stat-value" id="statMembers">-</div>
-                <div class="stat-label">Active Node Connections</div>
-                <p class="stat-desc">A global mesh of digital citizens engaged in the Spencer ecosystem.</p>
+                <div class="stat-label">Global Members</div>
+                <p class="stat-desc">A thriving community of enthusiasts from around the world.</p>
             </div>
         </div>
         <div class="stat-card bento-side reveal">
@@ -19,14 +19,14 @@
             <div class="stat-icon-wrap"><i class="fas fa-shield-alt"></i></div>
             <div class="stat-content">
                 <div class="stat-value">99.9<span class="teal">%</span></div>
-                <div class="stat-label">Architectural Stability</div>
+                <div class="stat-label">Uptime Guarantee</div>
             </div>
         </div>
         <div class="stat-card bento-small reveal">
             <div class="stat-icon-wrap"><i class="fas fa-comments"></i></div>
             <div class="stat-content">
                 <div class="stat-value">24<span class="teal">/</span>7</div>
-                <div class="stat-label">Neural Support</div>
+                <div class="stat-label">Live Support</div>
             </div>
         </div>
     </div>

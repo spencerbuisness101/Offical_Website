@@ -101,7 +101,7 @@
             
             <div class="pricing-footer">
                 <a href="shop.php?plan=lifetime" class="pricing-cta ripple-container">Secure Forever</a>
-                <p class="cta-note"><i class="fas fa-lock"></i> Limited slots available</p>
+                <p class="cta-note"><i class="fas fa-hourglass-half"></i> Limited slots available</p>
             </div>
         </div>
 

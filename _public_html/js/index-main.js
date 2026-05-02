@@ -186,12 +186,18 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     // If the login overlay is active, transition back to landing first, then scroll.
     function navToSection(e, hash) {
         if (e && e.preventDefault) e.preventDefault();
+        
+        // Safety check: if hash is empty or just '#', do nothing
+        if (!hash || hash === '#' || hash === '#!') return;
+        
         const loginPageEl = document.getElementById('loginPage');
         const scrollToTarget = () => {
-            if (!hash || hash === '#' || hash === '#!') return; // Safety check for empty hashes
             try {
+                // Ensure hash is a valid selector (e.g. #features)
                 const target = document.querySelector(hash);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             } catch (err) {
                 console.warn('Invalid scroll target:', hash);
             }
@@ -956,10 +962,21 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         });
 
         // --- Nav hash links without data-action ---
-        document.querySelectorAll('.nav-links a[href^="#"], .hero-ctas a[href^="#"]').forEach(function(link) {
-            if (link.hasAttribute('data-action')) return;
-            link.addEventListener('click', function(e) {
-                if (typeof navToSection === 'function') navToSection(e, this.getAttribute('href'));
-            });
+    // Prevent unintended double-click menu triggers
+    document.addEventListener('dblclick', e => {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Handle smooth internal navigation
+    document.querySelectorAll('.nav-links a[href^="#"], .hero-ctas a[href^="#"]').forEach(function(link) {
+        // Skip if it has a special action (like startExploringBtn which we handle separately)
+        if (link.hasAttribute('data-action') || link.id === 'startExploringBtn') return;
+        
+        link.addEventListener('click', function(e) {
+            const hash = this.getAttribute('href');
+            if (typeof navToSection === 'function') navToSection(e, hash);
         });
-    })();
+    });
+})();

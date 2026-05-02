@@ -15,8 +15,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'admin') {
 
 try {
     require_once __DIR__ . '/../../config/database.php';
-    $database = new Database();
-    $db = $database->getConnection();
+    $db = Database::getStaticConnection();
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'DB error']);
     exit;
@@ -34,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // User profile data
     if ($userId) {
         try {
-            $stmt = $db->prepare("SELECT id, username, role, is_suspended, created_at, last_login FROM users WHERE id = ?");
+            $stmt = $db->prepare("SELECT id, username, email, role, is_suspended, created_at, last_login, pfp_type, pfp_pending_url FROM users WHERE id = ?");
             $stmt->execute([$userId]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             if (!$user) { echo json_encode(['success' => false]); exit; }
@@ -238,7 +237,15 @@ switch ($action) {
 
 function logAdminAction($db, $action, $targetId = null, $details = '') {
     try {
-        $stmt = $db->prepare("INSERT INTO admin_audit_log (admin_id, admin_username, action, target_user_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$_SESSION['user_id'] ?? 0, $_SESSION['username'] ?? 'unknown', $action, $targetId, $details, $_SERVER['REMOTE_ADDR'] ?? '']);
+        $stmt = $db->prepare("INSERT INTO admin_audit_log (admin_id, admin_username, action, target_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $_SESSION['user_id'] ?? 0,
+            $_SESSION['username'] ?? 'unknown',
+            $action,
+            $targetId ? (int)$targetId : null,
+            $details,
+            $_SERVER['REMOTE_ADDR'] ?? '',
+            $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ]);
     } catch (Exception $e) {}
 }

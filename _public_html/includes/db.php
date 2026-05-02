@@ -22,17 +22,10 @@ if (!function_exists('db')) {
      * Throws RuntimeException on connection failure (same as Database class).
      */
     function db(): PDO {
-        static $pdo = null;
-        static $stats = ['queries' => 0, 'errors' => 0, 'connected_at' => null];
-
-        if ($pdo === null) {
-            if (!class_exists('Database')) {
-                require_once __DIR__ . '/../config/database.php';
-            }
-            $pdo = (new Database())->getConnection();
-            $stats['connected_at'] = microtime(true);
+        if (!class_exists('Database')) {
+            require_once __DIR__ . '/../config/database.php';
         }
-        return $pdo;
+        return Database::getStaticConnection();
     }
 }
 

@@ -10,10 +10,10 @@ $validSubs = ['ideas', 'backgrounds', 'pfps'];
 if (!in_array($subtab, $validSubs)) $subtab = 'ideas';
 ?>
 
-<div style="display:flex;gap:6px;margin-bottom:20px">
-    <a href="?tab=content&sub=ideas" class="btn btn-sm <?= $subtab==='ideas'?'btn-primary':'btn-ghost' ?>">Contributor Ideas</a>
-    <a href="?tab=content&sub=backgrounds" class="btn btn-sm <?= $subtab==='backgrounds'?'btn-primary':'btn-ghost' ?>">Designer Backgrounds</a>
-    <a href="?tab=content&sub=pfps" class="btn btn-sm <?= $subtab==='pfps'?'btn-primary':'btn-ghost' ?>">PFP Approvals</a>
+<div style="display:flex;gap:10px;margin-bottom:24px">
+    <a href="?tab=content&sub=ideas" class="chip <?= $subtab==='ideas'?'active':'' ?>">Contributor Ideas</a>
+    <a href="?tab=content&sub=backgrounds" class="chip <?= $subtab==='backgrounds'?'active':'' ?>">Designer Backgrounds</a>
+    <a href="?tab=content&sub=pfps" class="chip <?= $subtab==='pfps'?'active':'' ?>">PFP Approvals</a>
 </div>
 
 <?php if ($subtab === 'ideas'): ?>
@@ -23,28 +23,34 @@ try {
     $ideas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) { $ideas = []; }
 ?>
-<div class="card">
-    <div class="card-header"><span class="card-title">Contributor Ideas</span></div>
+<div class="admin-card">
+    <div class="card-header"><span class="card-title">Pending Ideas</span></div>
     <?php if ($ideas): ?>
-    <table class="data-table">
-        <thead><tr><th>Title</th><th>User</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php foreach ($ideas as $i): ?>
-        <tr>
-            <td><?= htmlspecialchars($i['title'] ?? $i['idea_text'] ?? 'Untitled') ?></td>
-            <td><?= htmlspecialchars($i['username']) ?></td>
-            <td><span class="tag <?= $i['priority']==='critical'?'tag-red':($i['priority']==='high'?'tag-amber':'tag-violet') ?>"><?= $i['priority'] ?? 'medium' ?></span></td>
-            <td><span class="tag <?= $i['status']==='pending'?'tag-amber':($i['status']==='approved'?'tag-teal':'tag-violet') ?>"><?= $i['status'] ?></span></td>
-            <td style="color:var(--text-muted);font-size:12px"><?= date('M j, Y', strtotime($i['created_at'])) ?></td>
-            <td>
-                <button class="btn btn-teal btn-sm" onclick="updateIdea(<?= $i['id'] ?>,'approved')">Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="updateIdea(<?= $i['id'] ?>,'rejected')">Reject</button>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?><p style="color:var(--text-muted)">No contributor ideas.</p><?php endif; ?>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>Title / Concept</th><th>User</th><th>Priority</th><th>Status</th><th>Logged</th><th>Actions</th></tr></thead>
+            <tbody>
+            <?php foreach ($ideas as $i): ?>
+            <tr>
+                <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="<?= htmlspecialchars($i['idea_text'] ?? '') ?>">
+                    <?= htmlspecialchars($i['title'] ?? $i['idea_text'] ?? 'Untitled Concept') ?>
+                </td>
+                <td><?= htmlspecialchars($i['username'] ?? 'Anonymous') ?></td>
+                <td><span class="badge badge--<?= ($i['priority']??'')==='critical'?'danger':(($i['priority']??'')==='high'?'warn':'violet') ?>"><?= strtoupper($i['priority'] ?? 'medium') ?></span></td>
+                <td><span class="badge badge--<?= ($i['status']??'')==='pending'?'warn':(($i['status']??'')==='approved'?'teal':'violet') ?>"><?= strtoupper($i['status'] ?? 'pending') ?></span></td>
+                <td class="text-muted" style="font-size:11px"><?= date('M j, Y', strtotime($i['created_at'])) ?></td>
+                <td>
+                    <div style="display:flex;gap:6px">
+                        <button class="btn btn-ghost btn-action" title="Approve" onclick="updateIdea(<?= $i['id'] ?>,'approved')"><i class="fas fa-check" style="color:var(--teal)"></i></button>
+                        <button class="btn btn-ghost btn-action" title="Reject" onclick="updateIdea(<?= $i['id'] ?>,'rejected')"><i class="fas fa-times" style="color:var(--danger)"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No ideas currently queued for review.</p><?php endif; ?>
 </div>
 
 <?php elseif ($subtab === 'backgrounds'): ?>
@@ -54,27 +60,31 @@ try {
     $backgrounds = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) { $backgrounds = []; }
 ?>
-<div class="card">
-    <div class="card-header"><span class="card-title">Designer Backgrounds</span></div>
+<div class="admin-card">
+    <div class="card-header"><span class="card-title">Asset Submissions</span></div>
     <?php if ($backgrounds): ?>
-    <table class="data-table">
-        <thead><tr><th>Name</th><th>User</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php foreach ($backgrounds as $b): ?>
-        <tr>
-            <td><?= htmlspecialchars($b['name'] ?? 'Untitled') ?></td>
-            <td><?= htmlspecialchars($b['username']) ?></td>
-            <td><span class="tag <?= $b['status']==='pending'?'tag-amber':($b['status']==='approved'?'tag-teal':'tag-red') ?>"><?= $b['status'] ?></span></td>
-            <td style="color:var(--text-muted);font-size:12px"><?= date('M j, Y', strtotime($b['created_at'])) ?></td>
-            <td>
-                <button class="btn btn-teal btn-sm" onclick="updateBackground(<?= $b['id'] ?>,'approved')">Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="updateBackground(<?= $b['id'] ?>,'rejected')">Reject</button>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?><p style="color:var(--text-muted)">No designer backgrounds.</p><?php endif; ?>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>Asset Name</th><th>Designer</th><th>Status</th><th>Logged</th><th>Actions</th></tr></thead>
+            <tbody>
+            <?php foreach ($backgrounds as $b): ?>
+            <tr>
+                <td><?= htmlspecialchars($b['title'] ?? 'Custom Backdrop') ?></td>
+                <td><?= htmlspecialchars($b['username'] ?? 'Anonymous') ?></td>
+                <td><span class="badge badge--<?= ($b['status']??'')==='pending'?'warn':(($b['status']??'')==='approved'?'teal':'danger') ?>"><?= strtoupper($b['status'] ?? 'pending') ?></span></td>
+                <td class="text-muted" style="font-size:11px"><?= date('M j, Y', strtotime($b['created_at'])) ?></td>
+                <td>
+                    <div style="display:flex;gap:6px">
+                        <button class="btn btn-ghost btn-action" onclick="updateBackground(<?= $b['id'] ?>,'approved')"><i class="fas fa-check" style="color:var(--teal)"></i></button>
+                        <button class="btn btn-ghost btn-action" onclick="updateBackground(<?= $b['id'] ?>,'rejected')"><i class="fas fa-times" style="color:var(--danger)"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No asset submissions pending.</p><?php endif; ?>
 </div>
 
 <?php elseif ($subtab === 'pfps'): ?>
@@ -84,29 +94,35 @@ try {
     $pendingPfps = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) { $pendingPfps = []; }
 ?>
-<div class="card">
-    <div class="card-header"><span class="card-title">Pending Profile Pictures</span></div>
+<div class="admin-card">
+    <div class="card-header"><span class="card-title">Avatar Approvals</span></div>
     <?php if ($pendingPfps): ?>
-    <table class="data-table">
-        <thead><tr><th>User</th><th>Preview</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php foreach ($pendingPfps as $p): ?>
-        <tr>
-            <td><?= htmlspecialchars($p['username']) ?></td>
-            <td>
-                <?php if ($p['pfp_pending_url']): ?>
-                <img src="<?= htmlspecialchars($p['pfp_pending_url']) ?>" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.1)">
-                <?php else: ?><span style="color:var(--text-muted)">File upload</span><?php endif; ?>
-            </td>
-            <td>
-                <button class="btn btn-teal btn-sm" onclick="decidePfp(<?= $p['id'] ?>,'approve')">Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="decidePfp(<?= $p['id'] ?>,'decline')">Decline</button>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?><p style="color:var(--text-muted)">No pending PFPs.</p><?php endif; ?>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>User</th><th>Preview</th><th>Actions</th></tr></thead>
+            <tbody>
+            <?php foreach ($pendingPfps as $p): ?>
+            <tr>
+                <td><?= htmlspecialchars($p['username']) ?></td>
+                <td>
+                    <?php if ($p['pfp_pending_url']): ?>
+                    <div style="width:48px;height:48px;border-radius:12px;overflow:hidden;border:1px solid rgba(123,110,246,0.3);box-shadow:0 0 15px rgba(123,110,246,0.1)">
+                        <img src="<?= htmlspecialchars($p['pfp_pending_url']) ?>" style="width:100%;height:100%;object-fit:cover">
+                    </div>
+                    <?php else: ?><span class="text-faint" style="font-size:11px">Local Blob</span><?php endif; ?>
+                </td>
+                <td>
+                    <div style="display:flex;gap:6px">
+                        <button class="btn btn-ghost btn-action" title="Approve" onclick="decidePfp(<?= $p['id'] ?>,'approve')"><i class="fas fa-check" style="color:var(--teal)"></i></button>
+                        <button class="btn btn-ghost btn-action" title="Decline" onclick="decidePfp(<?= $p['id'] ?>,'decline')"><i class="fas fa-times" style="color:var(--danger)"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No biometric updates pending.</p><?php endif; ?>
 </div>
 <?php endif; ?>
 

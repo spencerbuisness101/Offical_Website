@@ -23,111 +23,122 @@ $blockedCountries = json_decode(getSetting($db, 'blocked_countries', '[]'), true
 ?>
 
 <!-- Sub-tabs -->
-<div style="display:flex;gap:6px;margin-bottom:20px">
-    <a href="?tab=threats&sub=overview" class="btn btn-sm <?= $subtab==='overview'?'btn-primary':'btn-ghost' ?>">Overview</a>
-    <a href="?tab=threats&sub=blocked-ips" class="btn btn-sm <?= $subtab==='blocked-ips'?'btn-primary':'btn-ghost' ?>">Blocked IPs (<?= $blockedCount ?>)</a>
-    <a href="?tab=threats&sub=geo-block" class="btn btn-sm <?= $subtab==='geo-block'?'btn-primary':'btn-ghost' ?>">Geo-Block</a>
+<div style="display:flex;gap:10px;margin-bottom:24px">
+    <a href="?tab=threats&sub=overview" class="chip <?= $subtab==='overview'?'active':'' ?>">Threat Overview</a>
+    <a href="?tab=threats&sub=blocked-ips" class="chip <?= $subtab==='blocked-ips'?'active':'' ?>">Blocked IPs (<?= $blockedCount ?>)</a>
+    <a href="?tab=threats&sub=geo-block" class="chip <?= $subtab==='geo-block'?'active':'' ?>">Geo-Blocking</a>
 </div>
 
 <?php if ($subtab === 'overview'): ?>
 <!-- Stats -->
-<div class="stat-grid">
-    <div class="stat-box">
+<div class="stats-row">
+    <div class="stat-tile">
+        <div class="stat-icon red"><i class="fas fa-shield-virus"></i></div>
         <div class="stat-value" style="color:var(--red)"><?= $blockedCount ?></div>
         <div class="stat-label">Blocked IPs</div>
     </div>
-    <div class="stat-box">
+    <div class="stat-tile">
+        <div class="stat-icon amber"><i class="fas fa-user-secret"></i></div>
         <div class="stat-value" style="color:var(--amber)"><?= count($failedLogins) ?></div>
-        <div class="stat-label">Failed Login IPs (24h)</div>
+        <div class="stat-label">Failed Logins (24h)</div>
     </div>
-    <div class="stat-box">
+    <div class="stat-tile">
+        <div class="stat-icon violet"><i class="fas fa-tachometer-alt"></i></div>
         <div class="stat-value"><?= count($rateLimitHits) ?></div>
         <div class="stat-label">Rate-Limited IPs</div>
     </div>
 </div>
 
 <!-- Failed Logins -->
-<div class="card">
-    <div class="card-header"><span class="card-title">Failed Login Attempts (24h)</span></div>
+<div class="admin-card">
+    <div class="card-header"><span class="card-title">Failed Authentication Attempts (24h)</span></div>
     <?php if ($failedLogins): ?>
-    <table class="data-table">
-        <thead><tr><th>IP Address</th><th>Attempts</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php foreach ($failedLogins as $fl): ?>
-        <tr>
-            <td style="font-family:monospace"><?= htmlspecialchars($fl['ip_address']) ?></td>
-            <td><span class="tag <?= $fl['attempts']>=5?'tag-red':'tag-amber' ?>"><?= $fl['attempts'] ?></span></td>
-            <td><button class="btn btn-danger btn-sm" onclick="blockIp('<?= htmlspecialchars($fl['ip_address']) ?>')">Block</button></td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?><p style="color:var(--text-muted)">No failed login attempts in the last 24 hours.</p><?php endif; ?>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>Origin IP</th><th>Magnitude</th><th>Actions</th></tr></thead>
+            <tbody>
+            <?php foreach ($failedLogins as $fl): ?>
+            <tr>
+                <td style="font-family:var(--font-mono)"><?= htmlspecialchars($fl['ip_address']) ?></td>
+                <td><span class="badge badge--<?= $fl['attempts']>=5?'danger':'warn' ?>"><?= $fl['attempts'] ?> ATTEMPTS</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="blockIp('<?= htmlspecialchars($fl['ip_address']) ?>')" style="border-radius:8px">Block IP</button></td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No abnormal authentication patterns detected.</p><?php endif; ?>
 </div>
 
 <!-- Rate Limit Hits -->
-<div class="card">
-    <div class="card-header"><span class="card-title">Rate Limit Hits</span></div>
+<div class="admin-card">
+    <div class="card-header"><span class="card-title">Network Congestion (Rate Limits)</span></div>
     <?php if ($rateLimitHits): ?>
-    <table class="data-table">
-        <thead><tr><th>IP Address</th><th>Endpoint</th><th>Hits</th></tr></thead>
-        <tbody>
-        <?php foreach ($rateLimitHits as $rl): ?>
-        <tr>
-            <td style="font-family:monospace"><?= htmlspecialchars($rl['ip_address']) ?></td>
-            <td><span class="tag tag-violet"><?= htmlspecialchars($rl['endpoint']) ?></span></td>
-            <td><?= $rl['cnt'] ?></td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?><p style="color:var(--text-muted)">No rate limit hits.</p><?php endif; ?>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>IP Address</th><th>Endpoint</th><th>Hit Count</th></tr></thead>
+            <tbody>
+            <?php foreach ($rateLimitHits as $rl): ?>
+            <tr>
+                <td style="font-family:var(--font-mono)"><?= htmlspecialchars($rl['ip_address']) ?></td>
+                <td><span class="badge badge--violet"><?= strtoupper(htmlspecialchars($rl['endpoint'])) ?></span></td>
+                <td><span class="text-muted"><?= $rl['cnt'] ?> hits</span></td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No rate limit signal saturation detected.</p><?php endif; ?>
 </div>
 
 <?php elseif ($subtab === 'blocked-ips'): ?>
-<div class="card">
+<div class="admin-card">
     <div class="card-header">
         <span class="card-title">Blocked IP Addresses</span>
-        <button class="btn btn-ghost btn-sm" onclick="openBlockIpModal()"><i class="fas fa-plus"></i> Block IP</button>
+        <button class="btn btn-ghost btn-sm" onclick="openBlockIpModal()" style="border-radius:8px"><i class="fas fa-plus"></i> Block IP</button>
     </div>
     <?php if ($blockedIps): ?>
-    <table class="data-table">
-        <thead><tr><th>IP Address</th><th>Reason</th><th>Blocked At</th><th>Expires</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php foreach ($blockedIps as $b): ?>
-        <tr>
-            <td style="font-family:monospace"><?= htmlspecialchars($b['ip_address']) ?></td>
-            <td style="font-size:12px"><?= htmlspecialchars($b['reason']) ?></td>
-            <td style="color:var(--text-muted);font-size:12px"><?= date('M j, g:i A', strtotime($b['blocked_at'])) ?></td>
-            <td style="color:var(--text-muted);font-size:12px"><?= $b['expires_at'] ? date('M j, g:i A', strtotime($b['expires_at'])) : 'Never' ?></td>
-            <td><button class="btn btn-teal btn-sm" onclick="unblockIp('<?= htmlspecialchars($b['ip_address']) ?>')">Unblock</button></td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?><p style="color:var(--text-muted)">No blocked IPs.</p><?php endif; ?>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>IP Address</th><th>Reason</th><th>Blocked At</th><th>Expiry</th><th>Actions</th></tr></thead>
+            <tbody>
+            <?php foreach ($blockedIps as $b): ?>
+            <tr>
+                <td style="font-family:var(--font-mono)"><?= htmlspecialchars($b['ip_address']) ?></td>
+                <td style="font-size:11px"><?= htmlspecialchars($b['reason']) ?></td>
+                <td class="text-muted" style="font-size:11px"><?= date('M j, g:i A', strtotime($b['blocked_at'])) ?></td>
+                <td class="text-muted" style="font-size:11px"><?= $b['expires_at'] ? date('M j, g:i A', strtotime($b['expires_at'])) : 'PERMANENT' ?></td>
+                <td><button class="btn btn-ghost btn-action" onclick="unblockIp('<?= htmlspecialchars($b['ip_address']) ?>')" title="Unblock"><i class="fas fa-unlock" style="color:var(--teal)"></i></button></td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No nodes are currently blacklisted.</p><?php endif; ?>
 </div>
 
 <?php elseif ($subtab === 'geo-block'): ?>
-<div class="card">
+<div class="admin-card">
     <div class="card-header">
-        <span class="card-title">Country Blocking</span>
-        <span class="tag tag-amber"><?= count($blockedCountries) ?> countries blocked</span>
+        <span class="card-title">Geographic Blocking</span>
+        <span class="badge badge--warn"><?= count($blockedCountries) ?> Countries Blocked</span>
     </div>
-    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Users attempting to login from blocked countries will be rejected. Uses ISO 3166-1 alpha-2 country codes.</p>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-        <input type="text" class="form-input" style="width:100px" placeholder="e.g. CN" id="newCountryCode" maxlength="2">
-        <button class="btn btn-primary btn-sm" onclick="addBlockedCountry()">Add Country</button>
+    <div style="padding:16px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:12px;margin:16px;font-size:12px;color:var(--danger)">
+        <i class="fas fa-globe" style="margin-right:8px"></i> Connections from these regions will be automatically rejected.
+    </div>
+    <div style="display:flex;gap:12px;margin:0 16px 24px;align-items:center">
+        <input type="text" class="form-input" style="width:140px" placeholder="ISO Code (e.g. CN)" id="newCountryCode" maxlength="2">
+        <button class="btn btn-primary btn-sm" onclick="addBlockedCountry()" style="border-radius:10px">Restrict Region</button>
     </div>
     <?php if ($blockedCountries): ?>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 16px">
         <?php foreach ($blockedCountries as $cc): ?>
-        <span class="tag tag-red" style="cursor:pointer;font-size:13px;padding:6px 12px" onclick="removeBlockedCountry('<?= $cc ?>')" title="Click to remove">
-            <?= strtoupper($cc) ?> <i class="fas fa-times" style="margin-left:4px"></i>
+        <span class="badge badge--danger" style="cursor:pointer;font-size:12px;padding:8px 14px" onclick="removeBlockedCountry('<?= $cc ?>')" title="Remove Restriction">
+            <i class="fas fa-map-marker-alt" style="margin-right:6px"></i> <?= strtoupper($cc) ?> <i class="fas fa-times" style="margin-left:8px;opacity:0.6"></i>
         </span>
         <?php endforeach; ?>
     </div>
-    <?php else: ?><p style="color:var(--text-muted)">No countries blocked.</p><?php endif; ?>
+    <?php else: ?><p class="text-muted" style="padding:0 16px 20px;font-size:13px">No sovereign regions are currently restricted.</p><?php endif; ?>
 </div>
 <?php endif; ?>
 

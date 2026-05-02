@@ -165,14 +165,14 @@
             <h2 class="s-modal-title">Welcome to the Community</h2>
             <div class="community-tiles">
                 <div class="community-tile" data-action="login-close-community">
-                    <div class="community-tile-icon">??</div>
+                    <div class="community-tile-icon"><i class="fas fa-sign-in-alt"></i></div>
                     <div class="community-tile-title">Sign In</div>
-                    <button class="community-tile-cta">Sign In ?</button>
+                    <button class="community-tile-cta">Sign In <i class="fas fa-arrow-right"></i></button>
                 </div>
                 <div class="community-tile featured" data-action="show-guest-disclosure">
-                    <div class="community-tile-icon">?</div>
+                    <div class="community-tile-icon"><i class="fas fa-id-badge"></i></div>
                     <div class="community-tile-title">Guest Pass</div>
-                    <button class="community-tile-cta">Get Guest Pass ?</button>
+                    <button class="community-tile-cta">Get Guest Pass <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
         </div>
