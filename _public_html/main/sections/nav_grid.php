@@ -29,7 +29,6 @@ $isCommunity = isset($_SESSION['is_community_account']) && $_SESSION['is_communi
         <div class="mp-card" style="--mp-card-accent:#F472B6;">
             <h3>🔧 Plans / Updates / Fixes</h3>
             <p>Stay up to date with what we're building, what just shipped, and what's been patched recently.</p>
-            <p>CHANGES</p>
             <a href="up.php" class="mp-btn pink">See Updates</a>
         </div>
 

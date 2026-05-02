@@ -88,10 +88,6 @@ class ActivityTracker {
         this.sendData('api/track_game.php', data);
     }
 
-    trackMovieView(movieUrl) {
-        // No-op: movie feature removed. Kept for backward compatibility with
-        // any cached page code that may still invoke this method.
-    }
 
     trackContentInteractions() {
         const settings = document.querySelector('.settings-container');
