@@ -103,6 +103,10 @@ switch ($action) {
     case 'suspend':
         $uid = intval($_POST['user_id'] ?? 0);
         if (!$uid) { echo json_encode(['success' => false]); exit; }
+        if ($uid === intval($_SESSION['user_id'] ?? 0)) {
+            echo json_encode(['success' => false, 'message' => 'Cannot suspend your own account']);
+            exit;
+        }
         $stmt = $db->prepare("SELECT is_suspended FROM users WHERE id = ?"); $stmt->execute([$uid]);
         $current = $stmt->fetchColumn();
         $newVal = $current ? 0 : 1;
@@ -128,6 +132,10 @@ switch ($action) {
     case 'delete':
         $uid = intval($_POST['user_id'] ?? 0);
         if (!$uid) { echo json_encode(['success' => false]); exit; }
+        if ($uid === intval($_SESSION['user_id'] ?? 0)) {
+            echo json_encode(['success' => false, 'message' => 'Cannot delete your own account']);
+            exit;
+        }
         $stmt = $db->prepare("DELETE FROM users WHERE id = ?"); $stmt->execute([$uid]);
         logAdminAction($db, 'delete_user', $uid);
         echo json_encode(['success' => true, 'message' => 'Account deleted']);

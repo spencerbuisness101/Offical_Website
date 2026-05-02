@@ -20,9 +20,18 @@ try {
     $stmt->execute($params); $total = (int)$stmt->fetchColumn();
     $totalPages = max(1, ceil($total / $perPage));
 
-    $stmt = $db->prepare("SELECT id, admin_id, admin_username, action, target_user_id, details, ip_address, created_at FROM admin_audit_log WHERE $where ORDER BY created_at DESC LIMIT ? OFFSET ?");
-    $params[] = $perPage; $params[] = $offset;
-    $stmt->execute($params);
+    $stmt = $db->prepare("SELECT id, admin_id, admin_username, action, target_user_id, target_id, details, ip_address, created_at FROM admin_audit_log WHERE $where ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    
+    // Bind filters first
+    $bindIdx = 1;
+    foreach ($params as $p) {
+        $stmt->bindValue($bindIdx++, $p);
+    }
+    // Bind LIMIT and OFFSET explicitly as integers
+    $stmt->bindValue($bindIdx++, $perPage, PDO::PARAM_INT);
+    $stmt->bindValue($bindIdx++, $offset, PDO::PARAM_INT);
+    
+    $stmt->execute();
     $auditLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Action types for filter
@@ -84,7 +93,7 @@ try {
             <td style="color:var(--text-muted);font-size:12px;white-space:nowrap"><?= date('M j, g:i:s A', strtotime($l['created_at'])) ?></td>
             <td style="font-weight:500"><?= htmlspecialchars($l['admin_username']) ?></td>
             <td><span class="tag tag-violet"><?= htmlspecialchars($l['action']) ?></span></td>
-            <td style="color:var(--text-muted)"><?= $l['target_user_id'] ? '#'.$l['target_user_id'] : '—' ?></td>
+            <td style="color:var(--text-muted)"><?= $l['target_user_id'] ? 'User #'.$l['target_user_id'] : ($l['target_id'] ? 'ID #'.$l['target_id'] : '—') ?></td>
             <td style="font-family:monospace;font-size:11px;color:var(--text-dim)"><?= htmlspecialchars($l['ip_address']) ?></td>
             <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;color:var(--text-muted)"><?= htmlspecialchars($l['details'] ?? '') ?></td>
         </tr>

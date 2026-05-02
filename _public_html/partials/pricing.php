@@ -24,7 +24,7 @@
             
             <div class="pricing-footer">
                 <a href="#" class="pricing-cta ripple-container" data-action="create-guest">Start Free Journey</a>
-                <p class="cta-note">Instant activation</p>
+                <p class="cta-note">Immediate Provisioning</p>
             </div>
         </div>
 
@@ -47,7 +47,7 @@
             
             <div class="pricing-footer">
                 <a href="shop.php?plan=monthly" class="pricing-cta ripple-container">Elevate Experience</a>
-                <p class="cta-note"><i class="fas fa-sync-alt"></i> Billed monthly</p>
+                <p class="cta-note"><i class="fas fa-sync-alt"></i> Priority Provisioning</p>
             </div>
         </div>
 
@@ -78,7 +78,7 @@
             
             <div class="pricing-footer">
                 <a href="shop.php?plan=yearly" class="pricing-cta ripple-container">Claim Pro Access</a>
-                <p class="cta-note"><i class="fas fa-fire"></i> Most popular choice</p>
+                <p class="cta-note"><i class="fas fa-fire"></i> Most popular selection</p>
             </div>
         </div>
 
@@ -101,7 +101,7 @@
             
             <div class="pricing-footer">
                 <a href="shop.php?plan=lifetime" class="pricing-cta ripple-container">Secure Forever</a>
-                <p class="cta-note"><i class="fas fa-hourglass-half"></i> Limited slots available</p>
+                <p class="cta-note"><i class="fas fa-hourglass-half"></i> Limited availability</p>
             </div>
         </div>
 

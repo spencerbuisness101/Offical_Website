@@ -114,7 +114,7 @@ $blockedCountries = json_decode(getSetting($db, 'blocked_countries', '[]'), true
             </tbody>
         </table>
     </div>
-    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No nodes are currently blacklisted.</p><?php endif; ?>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No IP addresses are currently blocked.</p><?php endif; ?>
 </div>
 
 <?php elseif ($subtab === 'geo-block'): ?>
@@ -138,7 +138,7 @@ $blockedCountries = json_decode(getSetting($db, 'blocked_countries', '[]'), true
         </span>
         <?php endforeach; ?>
     </div>
-    <?php else: ?><p class="text-muted" style="padding:0 16px 20px;font-size:13px">No sovereign regions are currently restricted.</p><?php endif; ?>
+    <?php else: ?><p class="text-muted" style="padding:0 16px 20px;font-size:13px">No geographic regions are currently restricted.</p><?php endif; ?>
 </div>
 <?php endif; ?>
 

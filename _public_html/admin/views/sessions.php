@@ -12,29 +12,29 @@ try {
 
 <div class="admin-card">
     <div class="card-header">
-        <span class="card-title">Live Neural Links (Active Sessions)</span>
+        <span class="card-title">Live Sessions</span>
         <button class="btn btn-ghost btn-action" onclick="location.reload()"><i class="fas fa-sync-alt"></i></button>
     </div>
     <?php if ($sessions): ?>
     <div class="admin-table-wrap">
         <table class="admin-table">
-            <thead><tr><th>Entity</th><th>Uplink IP</th><th>Endpoint</th><th>Last Pulse</th><th>Action</th></tr></thead>
+            <thead><tr><th>User</th><th>IP Address</th><th>Current Page</th><th>Last Activity</th><th>Action</th></tr></thead>
             <tbody>
             <?php foreach ($sessions as $s): ?>
             <tr>
                 <td>
-                    <div style="font-weight:500;color:var(--text-soft)"><?= htmlspecialchars($s['username'] ?? 'Guest Node') ?></div>
+                    <div style="font-weight:500;color:var(--text-soft)"><?= htmlspecialchars($s['username'] ?? 'Guest Account') ?></div>
                 </td>
                 <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim)"><?= htmlspecialchars($s['ip_address']) ?></td>
                 <td style="font-size:11px;color:var(--accent-soft)"><?= htmlspecialchars(basename($s['current_page'] ?? 'main.php')) ?></td>
                 <td class="text-muted" style="font-size:11px"><?= date('g:i:s A', $s['last_activity']) ?></td>
-                <td><button class="btn btn-danger btn-sm" onclick="killSession('<?= htmlspecialchars($s['session_id']) ?>')" style="border-radius:8px">Sever</button></td>
+                <td><button class="btn btn-danger btn-sm" onclick="killSession('<?= htmlspecialchars($s['session_id']) ?>')" style="border-radius:8px">Terminate</button></td>
             </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No active neural links detected.</p><?php endif; ?>
+    <?php else: ?><p class="text-muted" style="padding:20px;font-size:13px">No active sessions detected.</p><?php endif; ?>
 </div>
 
 <script>

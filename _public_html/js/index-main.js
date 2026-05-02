@@ -192,8 +192,8 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         
         const loginPageEl = document.getElementById('loginPage');
         const scrollToTarget = () => {
+            if (!hash || hash === '#' || hash === '#!') return;
             try {
-                // Ensure hash is a valid selector (e.g. #features)
                 const target = document.querySelector(hash);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });

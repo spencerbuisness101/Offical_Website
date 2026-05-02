@@ -1390,11 +1390,25 @@ function getRoleTag($role, $userId = null, $db = null) {
 
                 // Performance: Throttle scroll events
                 let scrollTimeout;
-                document.getElementById('messagesContainer').addEventListener('scroll', () => {
+                const container = document.getElementById('messagesContainer');
+                container.addEventListener('scroll', () => {
                     if (!scrollTimeout) {
                         scrollTimeout = setTimeout(() => {
                             scrollTimeout = null;
                         }, 100);
+                    }
+                });
+
+                // Secure Event Delegation for message actions
+                container.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.action-btn');
+                    if (!btn) return;
+                    
+                    const action = btn.dataset.action;
+                    if (action === 'reply') {
+                        this.replyToMessage(btn.dataset.user);
+                    } else if (action === 'copy') {
+                        this.copyMessage(btn.dataset.text);
                     }
                 });
             }
@@ -1593,8 +1607,8 @@ function getRoleTag($role, $userId = null, $db = null) {
                         ${this.escapeHtml(message.message)}
                     </div>
                     <div class="message-actions">
-                        <button class="action-btn" onclick="yapsChat.replyToMessage('${this.escapeHtml(message.username)}')">Reply</button>
-                        <button class="action-btn" onclick="yapsChat.copyMessage('${this.escapeHtml(message.message)}')">Copy</button>
+                        <button class="action-btn" data-action="reply" data-user="${this.escapeHtml(message.username)}">Reply</button>
+                        <button class="action-btn" data-action="copy" data-text="${this.escapeHtml(message.message)}">Copy</button>
                     </div>
                 `;
                 

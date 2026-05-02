@@ -99,7 +99,7 @@ try {
 
 <!-- Quick Actions -->
 <div class="admin-card">
-    <div class="card-header"><span class="card-title">Command Protocols</span></div>
+    <div class="card-header"><span class="card-title">Administrative Actions</span></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap">
         <a href="?tab=content" class="btn btn-ghost btn-sm"><i class="fas fa-lightbulb"></i> Review Ideas (<?= $pendingIdeas ?>)</a>
         <a href="?tab=users" class="btn btn-ghost btn-sm"><i class="fas fa-user-cog"></i> Review PFPs (<?= $pendingPfps ?>)</a>
@@ -107,14 +107,14 @@ try {
         <a href="?tab=threats" class="btn btn-ghost btn-sm"><i class="fas fa-shield-alt"></i> Threat Monitor</a>
         <a href="?tab=announcements" class="btn btn-ghost btn-sm"><i class="fas fa-bullhorn"></i> Announcements</a>
         <button class="btn btn-sm <?= $paymentsEnabled ? 'btn-teal' : 'btn-danger' ?>" onclick="togglePayments()" style="border-radius:10px"><?= $paymentsEnabled ? '✓ Payments Online' : '⚠ Payments Offline' ?></button>
-        <button class="btn btn-sm <?= $maintenanceMode ? 'btn-danger' : 'btn-ghost' ?>" onclick="toggleMaintenance()" style="border-radius:10px"><?= $maintenanceMode ? '🚧 Lockdown Active' : 'Lockdown Inactive' ?></button>
+        <button class="btn btn-sm <?= $maintenanceMode ? 'btn-danger' : 'btn-ghost' ?>" onclick="toggleMaintenance()" style="border-radius:10px"><?= $maintenanceMode ? '🚧 Maintenance Active' : 'Maintenance Inactive' ?></button>
     </div>
 </div>
 
 <!-- Traffic Chart -->
 <div class="admin-card">
     <div class="card-header">
-        <span class="card-title">Network Traffic Log (Today)</span>
+        <span class="card-title">Traffic Activity (Today)</span>
         <button class="btn btn-ghost btn-sm" onclick="location.reload()" style="width:32px;height:32px;padding:0"><i class="fas fa-sync-alt"></i></button>
     </div>
     <div style="height:220px">
@@ -125,7 +125,7 @@ try {
 <!-- Two-column: Active Pages + Recent Audit -->
 <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:24px">
     <div class="admin-card">
-        <div class="card-header"><span class="card-title">Active Data Streams</span></div>
+        <div class="card-header"><span class="card-title">Current Activity</span></div>
         <?php if ($activePages): ?>
         <div class="admin-table-wrap">
             <table class="admin-table">
@@ -140,7 +140,7 @@ try {
                 </tbody>
             </table>
         </div>
-        <?php else: ?><p class="text-muted" style="font-size:13px">No active data streams detected.</p><?php endif; ?>
+        <?php else: ?><p class="text-muted" style="font-size:13px">No current activity detected.</p><?php endif; ?>
     </div>
     <div class="admin-card">
         <div class="card-header"><span class="card-title">Recent Administrative Actions</span></div>

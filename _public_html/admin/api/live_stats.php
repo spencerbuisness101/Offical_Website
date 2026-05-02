@@ -131,7 +131,7 @@ function getUserCount($db) {
 }
 
 function getActiveUsersCount($db) {
-    $stmt = $db->prepare("SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE last_activity > DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+    $stmt = $db->prepare("SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE last_activity > UNIX_TIMESTAMP() - 900");
     $stmt->execute();
     return (int)$stmt->fetchColumn();
 }
@@ -234,7 +234,7 @@ function getActiveSessions($db) {
             COUNT(DISTINCT user_id) as unique_users,
             AVG(TIMESTAMPDIFF(MINUTE, created_at, last_activity)) as avg_session_duration
         FROM user_sessions
-        WHERE last_activity > DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+        WHERE last_activity > UNIX_TIMESTAMP() - 1800
     ");
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }

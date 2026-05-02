@@ -160,26 +160,26 @@ $impersonatorId = $_SESSION['impersonator_id'] ?? null;
             </a>
             
             <nav class="sidebar-nav dark-scroll">
-                <div class="nav-group-label">Intelligence</div>
-                <a class="nav-item <?= $activeTab==='dashboard'?'active':'' ?>" href="?tab=dashboard"><i class="fas fa-radar"></i><span>Dashboard Center</span></a>
-                <a class="nav-item <?= $activeTab==='analytics'?'active':'' ?>" href="?tab=analytics"><i class="fas fa-chart-network"></i><span>Traffic Metrics</span></a>
+                <div class="nav-group-label">Analytics</div>
+                <a class="nav-item <?= $activeTab==='dashboard'?'active':'' ?>" href="?tab=dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <a class="nav-item <?= $activeTab==='analytics'?'active':'' ?>" href="?tab=analytics"><i class="fas fa-chart-line"></i><span>Traffic Metrics</span></a>
 
-                <div class="nav-group-label">Entities</div>
-                <a class="nav-item <?= $activeTab==='users'?'active':'' ?>" href="?tab=users"><i class="fas fa-users-viewfinder"></i><span>User Nodes</span></a>
-                <a class="nav-item <?= $activeTab==='sessions'?'active':'' ?>" href="?tab=sessions"><i class="fas fa-user-clock"></i><span>Active Links</span></a>
+                <div class="nav-group-label">User Management</div>
+                <a class="nav-item <?= $activeTab==='users'?'active':'' ?>" href="?tab=users"><i class="fas fa-users"></i><span>User Management</span></a>
+                <a class="nav-item <?= $activeTab==='sessions'?'active':'' ?>" href="?tab=sessions"><i class="fas fa-user-clock"></i><span>Live Sessions</span></a>
                 
-                <div class="nav-group-label">Resources</div>
-                <a class="nav-item <?= $activeTab==='content'?'active':'' ?>" href="?tab=content"><i class="fas fa-microchip"></i><span>Asset Management</span></a>
-                <a class="nav-item <?= $activeTab==='ai-chats'?'active':'' ?>" href="?tab=ai-chats"><i class="fas fa-brain"></i><span>AI Interaction Logs</span></a>
-                <a class="nav-item <?= $activeTab==='announcements'?'active':'' ?>" href="?tab=announcements"><i class="fas fa-broadcast-tower"></i><span>Site Announcements</span></a>
+                <div class="nav-group-label">Content</div>
+                <a class="nav-item <?= $activeTab==='content'?'active':'' ?>" href="?tab=content"><i class="fas fa-folder-open"></i><span>Content Management</span></a>
+                <a class="nav-item <?= $activeTab==='ai-chats'?'active':'' ?>" href="?tab=ai-chats"><i class="fas fa-comments"></i><span>AI Interactions</span></a>
+                <a class="nav-item <?= $activeTab==='announcements'?'active':'' ?>" href="?tab=announcements"><i class="fas fa-bullhorn"></i><span>Site Bulletins</span></a>
 
-                <div class="nav-group-label">Defense</div>
-                <a class="nav-item <?= $activeTab==='threats'?'active':'' ?>" href="?tab=threats"><i class="fas fa-shield-virus"></i><span>Threat Monitor</span></a>
-                <a class="nav-item <?= $activeTab==='access'?'active':'' ?>" href="?tab=access"><i class="fas fa-user-slash"></i><span>Restriction protocols</span></a>
-                <a class="nav-item <?= $activeTab==='audit'?'active':'' ?>" href="?tab=audit"><i class="fas fa-history"></i><span>Audit Stream</span></a>
+                <div class="nav-group-label">Security</div>
+                <a class="nav-item <?= $activeTab==='threats'?'active':'' ?>" href="?tab=threats"><i class="fas fa-shield-alt"></i><span>Threat Monitor</span></a>
+                <a class="nav-item <?= $activeTab==='access'?'active':'' ?>" href="?tab=access"><i class="fas fa-ban"></i><span>Access Restrictions</span></a>
+                <a class="nav-item <?= $activeTab==='audit'?'active':'' ?>" href="?tab=audit"><i class="fas fa-list-ul"></i><span>Audit Log</span></a>
 
-                <div class="nav-group-label">Infrastructure</div>
-                <a class="nav-item <?= $activeTab==='performance'?'active':'' ?>" href="?tab=performance"><i class="fas fa-tachometer-alt-fast"></i><span>Kernel Health</span></a>
+                <div class="nav-group-label">System</div>
+                <a class="nav-item <?= $activeTab==='performance'?'active':'' ?>" href="?tab=performance"><i class="fas fa-microchip"></i><span>Infrastructure</span></a>
                 <a class="nav-item <?= $activeTab==='logs'?'active':'' ?>" href="?tab=logs"><i class="fas fa-terminal"></i><span>System Logs</span></a>
             </nav>
 
