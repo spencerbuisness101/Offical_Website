@@ -1,4 +1,4 @@
-﻿/* === RESET (tokens.css provides :root variables) === */
+/* === RESET (tokens.css provides :root variables) === */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
@@ -2508,19 +2508,39 @@
     border-radius: 100px; font-size: 11px !important; color: var(--text-muted) !important;
     margin-top: 16px !important; border: 1px solid rgba(255,255,255,0.1);
 }
-.cta-note::before { content: 'â€¢'; color: var(--accent); font-size: 18px; line-height: 0; }
+.cta-note::before { content: '\f111'; font-family: "Font Awesome 5 Free"; font-weight: 900; color: var(--accent); font-size: 8px; line-height: 0; }
 
 /* === MATRIX SCROLL & FIX === */
 .comparison-matrix-scroll {
     overflow-x: auto; padding-bottom: 20px;
+    scrollbar-width: none; /* Firefox */
 }
-.comparison-matrix-container { min-width: 800px; }
-.matrix-btn { border-radius: 12px !important; padding: 12px 20px !important; font-size: 13px !important; }
+.comparison-matrix-scroll::-webkit-scrollbar { display: none; } /* Safari and Chrome */
+
+.comparison-matrix-container { min-width: 900px; }
+
+.matrix-footer { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.06); }
+.matrix-cta-group { display: flex; justify-content: center; gap: 40px; align-items: flex-end; }
+.cta-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.cta-price { font-size: 14px; font-weight: 700; color: var(--text-dim); letter-spacing: 0.05em; }
+.cta-price.highlighted { color: var(--gold); font-size: 18px; text-shadow: 0 0 10px rgba(255,215,0,0.2); }
+.matrix-btn { border-radius: 12px !important; padding: 14px 24px !important; font-size: 14px !important; white-space: nowrap; }
+.matrix-btn.highlight { transform: scale(1.05); }
+
+.matrix-footnote { margin-top: 30px; text-align: center; font-size: 11px; color: var(--text-dim); font-style: italic; opacity: 0.7; }
 
 /* === FEATURE DETAIL MODAL === */
-.modal-feature-detail { max-width: 500px !important; text-align: center; padding: 40px !important; }
-.feature-detail-icon { font-size: 64px; color: var(--accent); margin-bottom: 24px; }
-.feature-detail-body { font-size: 16px; line-height: 1.6; color: var(--text-muted); margin: 20px 0 32px; }
+.s-modal-overlay { display: flex; align-items: center; justify-content: center; padding: 20px; }
+.s-modal { 
+    max-height: 90vh; overflow-y: auto; 
+    scrollbar-width: thin; scrollbar-color: var(--accent) rgba(255,255,255,0.05);
+}
+.s-modal::-webkit-scrollbar { width: 6px; }
+.s-modal::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+.modal-feature-detail { max-width: 550px !important; text-align: center; padding: 50px !important; border: 1px solid rgba(123, 110, 246, 0.2); }
+.feature-detail-icon { font-size: 72px; color: var(--accent); margin-bottom: 30px; filter: drop-shadow(0 0 15px var(--accent-glow)); }
+.feature-detail-body { font-size: 17px; line-height: 1.8; color: var(--text-muted); margin: 24px 0 40px; text-align: left; }
 
 @media (max-width: 900px) {
     .stats-bento { grid-template-columns: 1fr 1fr; }

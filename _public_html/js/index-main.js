@@ -45,6 +45,10 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        
+        // Ensure modal content is scrollable if long
+        const content = modal.querySelector('.s-modal');
+        if (content) content.scrollTop = 0;
     }
 
     function closeFeatureDetail() {
@@ -179,7 +183,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
                         const start = performance.now();
                         function tick(now) {
                             const progress = Math.min((now - start) / duration, 1);
-                            const val = Math.floor(easeOutQuart(progress) * 4);
+                            const val = Math.floor(easeOutQuart(progress) * 6);
                             savingsEl.textContent = '$' + val;
                             if (progress < 1) requestAnimationFrame(tick);
                         }
@@ -577,21 +581,65 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         });
     })();
 
-    // === CURSOR DOT TRACKER (blue, small, disappears on reduced motion) ===
+    // === FLUID MOMENTUM CURSOR (Dual-element, magnetic feel) ===
     (function() {
         if (prefersReducedMotion) return;
-        var dot = document.createElement('div');
-        dot.style.cssText = 'position:fixed;width:8px;height:8px;border-radius:50%;background:rgba(123,110,246,0.5);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:opacity 0.3s ease;';
+        
+        const dot = document.createElement('div');
+        const ring = document.createElement('div');
+        
+        dot.id = 'cursor-dot';
+        ring.id = 'cursor-ring';
+        
+        dot.style.cssText = 'position:fixed;width:6px;height:6px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:100000;transform:translate(-50%,-50%);transition:opacity 0.3s, transform 0.1s;';
+        ring.style.cssText = 'position:fixed;width:30px;height:30px;border:1.5px solid var(--accent);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:opacity 0.3s, width 0.3s, height 0.3s, border-color 0.3s;';
+        
         document.body.appendChild(dot);
-        var hideTimeout;
-        document.addEventListener('mousemove', function(e) {
-            dot.style.left = e.clientX + 'px';
-            dot.style.top = e.clientY + 'px';
+        document.body.appendChild(ring);
+        
+        let mouseX = -100, mouseY = -100;
+        let ringX = -100, ringY = -100;
+        let isHovering = false;
+        
+        document.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            dot.style.left = mouseX + 'px';
+            dot.style.top = mouseY + 'px';
             dot.style.opacity = '1';
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(function() { dot.style.opacity = '0'; }, 2000);
+            ring.style.opacity = '1';
+            
+            const target = e.target.closest('a, button, .pricing-card, .feature-card, [data-action]');
+            if (target && !isHovering) {
+                isHovering = true;
+                ring.style.width = '50px';
+                ring.style.height = '50px';
+                ring.style.borderColor = 'rgba(123, 110, 246, 0.8)';
+                dot.style.transform = 'translate(-50%,-50%) scale(1.5)';
+            } else if (!target && isHovering) {
+                isHovering = false;
+                ring.style.width = '30px';
+                ring.style.height = '30px';
+                ring.style.borderColor = 'var(--accent)';
+                dot.style.transform = 'translate(-50%,-50%) scale(1)';
+            }
         });
-        document.addEventListener('mouseleave', function() { dot.style.opacity = '0'; });
+        
+        // Smooth ring follow (lag effect)
+        function animateRing() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            ring.style.left = ringX + 'px';
+            ring.style.top = ringY + 'px';
+            requestAnimationFrame(animateRing);
+        }
+        animateRing();
+        
+        document.addEventListener('mouseleave', () => {
+            dot.style.opacity = '0';
+            ring.style.opacity = '0';
+        });
     })();
 
     // === FEATURE CARD EXPAND (v7.1: single-open, dim-others, keyboard, ESC) ===

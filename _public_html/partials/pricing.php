@@ -30,12 +30,12 @@
 
         <!-- Monthly (Premium) -->
         <div class="pricing-card card-monthly reveal">
-            <div class="pricing-badge">Most Flexible</div>
+            <div class="pricing-badge">Flexible Entry</div>
             <div class="pricing-name"><i class="fas fa-bolt tier-icon"></i> Premium Monthly</div>
-            <div class="pricing-price">$4.50<span>/mo</span></div>
-            <div class="pricing-subprice">Flexible billing, cancel anytime</div>
+            <div class="pricing-price">$3.00<span>/mo</span></div>
+            <div class="pricing-subprice">Instant activation, cancel anytime</div>
             
-            <div class="pricing-description">Full access to all premium features with the freedom to adapt as you go.</div>
+            <div class="pricing-description">Unlock the full potential of the platform with our most accessible premium tier.</div>
             
             <ul class="pricing-features">
                 <li><i class="fas fa-check"></i> Unlimited Premium Games</li>
@@ -46,8 +46,8 @@
             </ul>
             
             <div class="pricing-footer">
-                <a href="shop.php?plan=monthly" class="pricing-cta ripple-container">Unlock Premium</a>
-                <p class="cta-note">Billed monthly</p>
+                <a href="shop.php?plan=monthly" class="pricing-cta ripple-container">Elevate Experience</a>
+                <p class="cta-note"><i class="fas fa-sync-alt"></i> Billed monthly</p>
             </div>
         </div>
 
@@ -55,22 +55,22 @@
         <div class="pricing-card card-yearly reveal">
             <i class="fas fa-crown yearly-crown"></i>
             <div class="yearly-badges">
-                <span class="yearly-badge popular">★ Best Value</span>
-                <span class="yearly-badge savings">Save <span id="yearlySavings">$4</span> Yearly</span>
+                <span class="yearly-badge popular">★ Elite Choice</span>
+                <span class="yearly-badge savings">Save <span id="yearlySavings">$6</span> Yearly</span>
             </div>
             
             <div class="pricing-name">Premium Yearly</div>
             
             <div class="yearly-price-wrap">
-                <span class="yearly-price-old">$54</span>
-                <div class="pricing-price" id="yearlyPrice">$50<span>/yr</span></div>
+                <span class="yearly-price-old">$36</span>
+                <div class="pricing-price" id="yearlyPrice">$30<span>/yr</span></div>
             </div>
             
-            <div class="pricing-description">The ultimate choice for dedicated enthusiasts. Maximum features, minimum cost.</div>
+            <div class="pricing-description">The ultimate choice for dedicated enthusiasts. Maximum performance, optimized cost.</div>
             
             <ul class="pricing-features">
                 <li><i class="fas fa-star"></i> <strong>Everything in Monthly</strong></li>
-                <li><i class="fas fa-star"></i> 2 Months Free ($9.00 Value)</li>
+                <li><i class="fas fa-star"></i> 2 Months Free ($6.00 Value)</li>
                 <li><i class="fas fa-star"></i> Exclusive Yearly Member Badge</li>
                 <li><i class="fas fa-star"></i> Early Access to Beta Games</li>
                 <li><i class="fas fa-star"></i> Priority Support Line</li>
@@ -78,18 +78,18 @@
             
             <div class="pricing-footer">
                 <a href="shop.php?plan=yearly" class="pricing-cta ripple-container">Claim Pro Access</a>
-                <p class="cta-note">Most popular choice</p>
+                <p class="cta-note"><i class="fas fa-fire"></i> Most popular choice</p>
             </div>
         </div>
 
         <!-- Lifetime (VIP) -->
         <div class="pricing-card card-lifetime reveal">
-            <div class="pricing-badge vip">Limited Edition</div>
+            <div class="pricing-badge vip">Legacy Edition</div>
             <div class="pricing-name"><i class="fas fa-gem tier-icon"></i> Premium Lifetime</div>
             <div class="pricing-price">$100</div>
-            <div class="pricing-subprice">One-time payment, forever access</div>
+            <div class="pricing-subprice">One-time investment, infinite access</div>
             
-            <div class="pricing-description">Secure your legacy. Never pay for a subscription again.</div>
+            <div class="pricing-description">Secure your legacy in our universe. Never pay for a subscription again.</div>
             
             <ul class="pricing-features">
                 <li><i class="fas fa-crown"></i> <strong>Everything in Pro Yearly</strong></li>
@@ -101,7 +101,7 @@
             
             <div class="pricing-footer">
                 <a href="shop.php?plan=lifetime" class="pricing-cta ripple-container">Secure Forever</a>
-                <p class="cta-note">Limited slots available</p>
+                <p class="cta-note"><i class="fas fa-lock"></i> Limited slots available</p>
             </div>
         </div>
 

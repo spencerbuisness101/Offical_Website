@@ -122,11 +122,20 @@
 
         <div class="matrix-footer">
             <div class="matrix-cta-group">
-                <a href="shop.php?plan=monthly" class="btn-secondary matrix-btn">Get Monthly</a>
-                <a href="shop.php?plan=yearly" class="btn-primary matrix-btn highlight">Claim Yearly (Best Value)</a>
-                <a href="shop.php?plan=lifetime" class="btn-secondary matrix-btn">Get Lifetime</a>
+                <div class="cta-col">
+                    <span class="cta-price">$3.00/mo</span>
+                    <a href="shop.php?plan=monthly" class="btn-secondary matrix-btn">Get Monthly</a>
+                </div>
+                <div class="cta-col">
+                    <span class="cta-price highlighted">$30.00/yr</span>
+                    <a href="shop.php?plan=yearly" class="btn-primary matrix-btn highlight">Claim Elite Yearly</a>
+                </div>
+                <div class="cta-col">
+                    <span class="cta-price">$100.00</span>
+                    <a href="shop.php?plan=lifetime" class="btn-secondary matrix-btn">Get Lifetime</a>
+                </div>
             </div>
-            <p class="matrix-footnote">*Prices in USD. Cancel anytime. All tiers contribute to platform growth.</p>
+            <p class="matrix-footnote">All plans include immediate neural access. Cancel or upgrade anytime with zero friction.</p>
         </div>
     </div>
 </div>
