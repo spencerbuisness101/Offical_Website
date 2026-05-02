@@ -657,4 +657,209 @@
             <a href="main.php" class="back-button"><i class="fa-solid fa-house"></i> Back to Home</a>
         </div>
 
-    </div>
+    </div><!-- /page-wrapper -->
+
+    <script>
+        // ========================================
+        // Hero Carousel
+        // ========================================
+        (function() {
+            const cards = document.querySelectorAll('.hero-card');
+            const dots  = document.querySelectorAll('.carousel-dot');
+            let current = 0;
+            let interval;
+
+            function goTo(idx) {
+                cards[current].classList.remove('active');
+                dots[current].classList.remove('active');
+                current = idx;
+                cards[current].classList.add('active');
+                dots[current].classList.add('active');
+            }
+
+            function next() { goTo((current + 1) % cards.length); }
+
+            function startAuto() { interval = setInterval(next, 5000); }
+            function stopAuto()  { clearInterval(interval); }
+
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    stopAuto();
+                    goTo(parseInt(this.dataset.dot));
+                    startAuto();
+                });
+            });
+
+            startAuto();
+        })();
+
+        // ========================================
+        // Search
+        // ========================================
+        (function() {
+            const input   = document.getElementById('gameSearch');
+            const clear   = document.getElementById('searchClear');
+            const grid    = document.getElementById('gamesGrid');
+            const noRes   = document.getElementById('noResults');
+
+            function filterBySearch() {
+                const q = input.value.trim().toLowerCase();
+                clear.classList.toggle('visible', q.length > 0);
+
+                const cards = grid.querySelectorAll('.game-card');
+                let visibleCount = 0;
+                const activeTab = document.querySelector('.category-tab.active');
+                const activeCat = activeTab ? activeTab.dataset.category : 'all';
+
+                cards.forEach(card => {
+                    const title = (card.dataset.title || '').toLowerCase();
+                    const cat   = card.dataset.category || '';
+                    const matchSearch = !q || title.includes(q);
+                    const matchCat = activeCat === 'all' || cat === activeCat;
+
+                    if (matchSearch && matchCat) {
+                        card.style.display = '';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                noRes.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+
+            input.addEventListener('input', filterBySearch);
+
+            clear.addEventListener('click', function() {
+                input.value = '';
+                clear.classList.remove('visible');
+                filterBySearch();
+                input.focus();
+            });
+
+            // Expose for category tabs
+            window._filterBySearch = filterBySearch;
+        })();
+
+        // ========================================
+        // Category Tabs with Count Badges
+        // ========================================
+        (function() {
+            const tabs  = document.querySelectorAll('.category-tab');
+            const cards = document.querySelectorAll('.game-card');
+
+            // Populate count badges
+            const counts = {};
+            let total = 0;
+            cards.forEach(card => {
+                const cat = card.dataset.category;
+                if (!cat) return;
+                // Don't count the "More Games Coming" placeholder
+                if (card.dataset.title === 'More Games Coming') return;
+                counts[cat] = (counts[cat] || 0) + 1;
+                total++;
+            });
+
+            const allCount = document.getElementById('count-all');
+            if (allCount) allCount.textContent = total;
+
+            Object.keys(counts).forEach(cat => {
+                const el = document.getElementById('count-' + cat);
+                if (el) el.textContent = counts[cat];
+            });
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Re-run search filter (which also respects category)
+                    if (window._filterBySearch) window._filterBySearch();
+                });
+            });
+        })();
+
+        // ========================================
+        // IntersectionObserver Stagger Animation
+        // ========================================
+        (function() {
+            const cards = document.querySelectorAll('.game-card');
+            let delay = 0;
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const card = entry.target;
+                        const stagger = parseInt(card.dataset.stagger || '0');
+                        card.style.transitionDelay = stagger + 'ms';
+                        card.style.transition = 'opacity 0.5s ease ' + stagger + 'ms, transform 0.5s ease ' + stagger + 'ms';
+                        card.classList.add('visible');
+                        observer.unobserve(card);
+                    }
+                });
+            }, {
+                threshold: 0.08,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            cards.forEach(function(card, i) {
+                card.dataset.stagger = (i % 8) * 80; // stagger in groups of 8
+                observer.observe(card);
+            });
+        })();
+
+        // ========================================
+        // Logout
+        // ========================================
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                const logoutBtn = document.querySelector('.logout-btn');
+                const originalText = logoutBtn.innerHTML;
+                logoutBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging out...';
+                logoutBtn.disabled = true;
+
+                fetch('auth/logout.php')
+                    .then(response => {
+                        if (response.ok) {
+                            logoutBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+                            setTimeout(() => { window.location.href = 'index.php'; }, 1000);
+                        } else {
+                            throw new Error('Logout failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        logoutBtn.innerHTML = originalText;
+                        logoutBtn.disabled = false;
+                        alert('Logout failed. Please try again.');
+                    });
+            }
+        }
+
+        // ========================================
+        // Background Selection Functionality
+        // ========================================
+        function openBackgroundModal() {
+            const modal = document.getElementById('backgroundModal');
+            const grid = document.getElementById('backgroundsGrid');
+            grid.innerHTML = '';
+
+            const backgrounds = <?php echo json_encode($available_backgrounds); ?>;
+            const currentBackground = getCurrentBackground();
+
+            backgrounds.forEach(background => {
+                const isActive = currentBackground === background.image_url;
+
+                const backgroundItem = document.createElement('div');
+                backgroundItem.className = 'background-item' + (isActive ? ' active' : '');
+                backgroundItem.innerHTML =
+                    '<div class="background-preview" style="background-image: url(\'' + background.image_url + '\')"></div>' +
+                    '<div class="background-info">' +
+                        '<div class="background-title">' + escapeHtml(background.title) + '</div>' +
+                        '<div class="background-designer">By: ' + escapeHtml(background.designer_name) + '</div>' +
+                        '<div class="background-actions">' +
+                            '<button class="btn-set-background" onclick="setAsBackground(\'' + background.image_url + '\', \'' + escapeHtml(background.title) + '\')">' +
+                                (isActive ? '<i class="fa-solid fa-check"></i> Using' : 'Use This') +
+                            '</button>' +
+                        '</div>' +
+                    '
