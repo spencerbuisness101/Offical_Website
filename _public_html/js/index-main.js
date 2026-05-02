@@ -248,8 +248,9 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
                 const memberSuffix = members >= 1000 ? '+' : '';
                 animateCounter(document.getElementById('statMembers'), members, 2000, memberSuffix);
 
-                // Games
-                animateCounter(document.getElementById('statGames'), games, 2000, '');
+                // Games (Enforce 50+ as requested)
+                const targetGames = Math.max(games, 50);
+                animateCounter(document.getElementById('statGames'), targetGames, 2000, '+');
 
                 // Update community section member count
                 const communityEl = document.getElementById('communityMemberCount');
@@ -581,7 +582,39 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         });
     })();
 
-    // === FLUID MOMENTUM CURSOR (Dual-element, magnetic feel) ===
+    // === MAGNETIC BUTTONS (Surprise Polish) ===
+    (function() {
+        if (prefersReducedMotion) return;
+        const magneticElements = document.querySelectorAll('.btn-primary, .pricing-cta, .feat-cta-primary');
+        
+        magneticElements.forEach(el => {
+            el.addEventListener('mousemove', e => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                el.style.transform = `translate(${x * 0.3}px, ${y * 0.5}px) scale(1.05)`;
+                if (el.querySelector('i')) {
+                    el.querySelector('i').style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+                }
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = '';
+                if (el.querySelector('i')) {
+                    el.querySelector('i').style.transform = '';
+                }
+            });
+        });
+    })();
+
+    // === PREVENT ACCIDENTAL DOUBLE-CLICK MENU ===
+    document.addEventListener('dblclick', e => {
+        if (!e.target.closest('input, textarea, [contenteditable="true"]')) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, { capture: true });
     (function() {
         if (prefersReducedMotion) return;
         

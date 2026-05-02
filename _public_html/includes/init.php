@@ -12,7 +12,7 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
 
 // Site version constant — single source of truth for displayed version string.
 // Used by page titles, footers, and anywhere the version is displayed.
-define('SITE_VERSION', '7.5');
+define('SITE_VERSION', '7.6');
 
 // Development mode: loads unminified JS/CSS assets (set false for production)
 define('DEBUG', true);

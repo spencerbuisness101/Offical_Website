@@ -11,8 +11,8 @@
         <div class="stat-card bento-side reveal">
             <div class="stat-icon-wrap"><i class="fas fa-gamepad"></i></div>
             <div class="stat-content">
-                <div class="stat-value" id="statGames">-</div>
-                <div class="stat-label">Bespoke Software Assets</div>
+                <div class="stat-value" id="statGames">50+</div>
+                <div class="stat-label">Software Assets</div>
             </div>
         </div>
         <div class="stat-card bento-small reveal">
