@@ -63,6 +63,7 @@ $user_id = $_SESSION['user_id'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Explore Spencer's Game Collection - HTML5 games and entertainment">
     <title>Game Collection - Spencer's Website</title>
+    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/command-palette.css">
@@ -72,512 +73,267 @@ $user_id = $_SESSION['user_id'];
     <!-- Cinematic background module -->
     <script src="js/cinematic-bg.js?v=<?php echo SITE_VERSION; ?>" defer></script>
 <style>
+    /* ========================================
+       Game Center — Core UI Overhaul v7.0
+       ======================================== */
+    
+    :root {
+        --game-card-bg: var(--glass-bg);
+        --game-card-border: var(--border-subtle);
+        --game-card-shadow: var(--shadow-sm);
+        --spotlight-height: 480px;
+        --grid-gap: var(--space-6);
+    }
+
     body {
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        background: var(--bg-primary);
-        color: var(--text-primary);
-        min-height: 100vh;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: var(--font-sans);
+        margin: 0;
         overflow-x: hidden;
     }
 
-    /* ========================================
-       Background System (preserved)
-       ======================================== */
-    .bg-theme-override {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: -2;
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        transition: background-image 0.5s ease-in-out;
-    }
-
-    .bg-theme-override::after {
-        content: '';
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: linear-gradient(135deg, rgba(15,23,42,0.82) 0%, rgba(15,23,42,0.92) 100%);
-        z-index: -1;
-    }
-
-    .bg-theme-override.designer-bg::after {
-        background: rgba(15,23,42,0.75);
-    }
-
-    /* ========================================
-       Background Selection Modal
-       ======================================== */
-    .background-modal {
-        display: none;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85);
-        z-index: 10000;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-
-    .background-modal-content {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%,-50%);
-        background: rgba(30,41,59,0.97);
-        border: 1px solid var(--border-glass);
-        border-radius: var(--radius-lg);
-        width: 90%; max-width: 1000px;
-        max-height: 90vh;
-        overflow-y: auto;
-        padding: 2rem;
-    }
-
-    .background-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid var(--border-glass);
-    }
-
-    .background-modal-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        background: var(--grad-purple);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .background-modal-close {
-        background: none;
-        border: none;
-        color: var(--text-secondary);
-        font-size: 1.5rem;
-        cursor: pointer;
-        width: 30px; height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .background-modal-close:hover { color: white; }
-
-    .backgrounds-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .background-item {
-        background: rgba(15,23,42,0.7);
-        border-radius: 12px;
-        overflow: hidden;
-        border: 2px solid var(--border-glass);
-        transition: var(--transition-med);
-        cursor: pointer;
-    }
-
-    .background-item:hover {
-        transform: translateY(-4px);
-        border-color: var(--purple);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-
-    .background-item.active {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(45,212,191,0.3);
-    }
-
-    .background-preview {
-        width: 100%; height: 150px;
-        background-size: cover;
-        background-position: center;
-    }
-
-    .background-info { padding: 1rem; }
-
-    .background-title {
-        font-weight: 600;
-        color: white;
-        margin-bottom: 0.5rem;
-        font-size: 0.95rem;
-    }
-
-    .background-designer {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
-    }
-
-    .background-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-
-    .btn-set-background {
-        background: var(--grad-purple);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: var(--transition-med);
-        flex: 1;
-    }
-
-    .btn-set-background:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-    }
-
-    .btn-remove-background {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: var(--transition-med);
-    }
-
-    .btn-remove-background:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(239,68,68,0.4);
-    }
-
-    /* ========================================
-       Control Buttons
-       ======================================== */
-    .control-buttons-container {
-        position: fixed;
-        top: 25px; right: 25px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 1001;
-    }
-
-    .logout-btn, .setting-btn, .backgrounds-btn, .home-btn {
-        background: var(--grad-teal);
-        color: #fff;
-        padding: 12px 20px;
-        border: none;
-        border-radius: var(--radius-sm);
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: var(--transition-med);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        white-space: nowrap;
-    }
-
-    .setting-btn { background: var(--grad-purple); }
-    .backgrounds-btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-    .home-btn { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
-    .logout-btn { background: var(--grad-coral); }
-
-    .logout-btn:hover, .setting-btn:hover, .backgrounds-btn:hover, .home-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-        color: #fff;
-    }
-
-    /* ========================================
-       Active Background Info
-       ======================================== */
-    .background-info-section {
-        text-align: center;
-        margin: 0 auto 40px;
-        padding: 20px;
-        background: var(--bg-card);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-        border-radius: var(--radius-md);
-        max-width: 600px;
-        border: 1px solid var(--border-glass);
-        color: white;
-    }
-
-    .background-info-section h3 {
-        color: white;
-        margin-bottom: 10px;
-        font-size: 1.2em;
-    }
-
-    .background-info-section p {
-        margin: 5px 0;
-        opacity: 0.9;
-    }
-
-    /* ========================================
-       Layout Wrapper
-       ======================================== */
-    .page-wrapper {
-        max-width: 1400px;
+    .mp-root {
+        max-width: var(--container-max);
         margin: 0 auto;
-        padding: 30px 24px 60px;
+        padding: var(--space-10) var(--space-6);
+        position: relative;
+        z-index: 1;
     }
 
-    /* ========================================
-       Back Button
-       ======================================== */
+    /* --- Back Link --- */
     .back-link {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        color: var(--text-secondary);
+        gap: var(--space-2);
+        color: var(--text-muted);
         text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-        padding: 10px 20px;
-        border-radius: var(--radius-pill);
-        background: var(--bg-card);
-        border: 1px solid var(--border-glass);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-        transition: var(--transition-med);
-        margin-bottom: 30px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: var(--space-8);
+        transition: var(--transition);
     }
-
     .back-link:hover {
         color: var(--teal);
-        border-color: var(--teal);
-        background: rgba(45,212,191,0.08);
         transform: translateX(-4px);
     }
 
-    .back-link i { transition: transform var(--transition-fast); }
-    .back-link:hover i { transform: translateX(-3px); }
-
-    /* ========================================
-       Page Header
-       ======================================== */
+    /* --- Page Header --- */
     .page-header {
         text-align: center;
-        margin-bottom: 40px;
-        padding: 50px 20px 40px;
-        background: var(--bg-card);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border-glass);
+        margin-bottom: var(--space-10);
         position: relative;
-        overflow: hidden;
+        z-index: 2;
     }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--coral), var(--teal));
-    }
-
     .page-header h1 {
-        font-size: 2.8rem;
+        font-size: clamp(32px, 5vw, 48px);
         font-weight: 700;
-        margin-bottom: 12px;
-        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-3);
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-
     .page-header p {
-        font-size: 1.15rem;
-        color: var(--text-secondary);
+        color: var(--text-muted);
+        font-size: 18px;
         max-width: 600px;
-        margin: 0 auto;
+        margin: 0 auto var(--space-6);
     }
 
-    /* ========================================
-       Hero / Featured Carousel
-       ======================================== */
+    .header-actions {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-4);
+        margin-top: var(--space-6);
+    }
+
+    .btn-action {
+        padding: 10px 20px;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: var(--border);
+        background: var(--bg-elevated);
+        color: #fff;
+    }
+
+    .btn-action:hover {
+        background: var(--glass-bg-hover);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+    }
+
+    .btn-action.primary {
+        background: var(--gradient);
+        border-color: transparent;
+        box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+
+    /* --- Spotlight (Hero Carousel) --- */
     .hero-carousel {
         position: relative;
-        max-width: 900px;
-        margin: 0 auto 50px;
-        height: 340px;
+        height: var(--spotlight-height);
+        margin-bottom: var(--space-10);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: var(--border-violet);
+        box-shadow: var(--shadow-violet);
     }
-
     .hero-card {
         position: absolute;
         inset: 0;
         opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.5s ease;
+        visibility: hidden;
+        transition: opacity 0.8s var(--ease-out), visibility 0.8s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
     }
-
     .hero-card.active {
         opacity: 1;
-        pointer-events: auto;
+        visibility: visible;
         z-index: 2;
     }
-
     .hero-card-inner {
-        position: relative;
         width: 100%;
         height: 100%;
-        border-radius: var(--radius-lg);
-        background: var(--bg-card);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-        border: 2px solid transparent;
-        padding: 40px 50px;
+        padding: var(--space-10);
+        background: linear-gradient(to right, rgba(4, 4, 10, 0.9) 0%, rgba(4, 4, 10, 0.4) 60%, transparent 100%);
         display: flex;
         flex-direction: column;
         justify-content: center;
-        text-align: center;
-        overflow: hidden;
+        align-items: flex-start;
+        backdrop-filter: blur(4px);
     }
-
-    .hero-card-inner::before { display: none; }
-
     .hero-emoji {
-        font-size: 3.5rem;
-        margin-bottom: 12px;
-        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+        font-size: 48px;
+        margin-bottom: var(--space-4);
+        filter: drop-shadow(0 0 10px var(--accent));
     }
-
     .hero-card-inner h2 {
-        font-size: 1.9rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 10px;
+        font-size: clamp(28px, 4vw, 42px);
+        margin: 0 0 var(--space-3);
+        color: #fff;
     }
-
     .hero-card-inner p {
-        color: var(--text-secondary);
-        font-size: 1rem;
+        max-width: 500px;
+        color: var(--text-soft);
+        font-size: 16px;
         line-height: 1.6;
-        margin-bottom: 20px;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
+        margin-bottom: var(--space-6);
     }
-
     .hero-stats {
         display: flex;
-        justify-content: center;
-        gap: 32px;
-        margin-bottom: 24px;
+        gap: var(--space-6);
+        margin-bottom: var(--space-8);
     }
-
     .hero-stat {
-        text-align: center;
+        display: flex;
+        flex-direction: column;
     }
-
     .hero-stat-val {
-        font-size: 1.3rem;
-        font-weight: 800;
+        font-size: 18px;
+        font-weight: 700;
         color: var(--teal);
     }
-
     .hero-stat-lbl {
-        font-size: 0.75rem;
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-muted);
+        color: var(--text-dim);
+        letter-spacing: 0.05em;
     }
-
     .hero-play-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 14px 36px;
-        background: var(--grad-teal);
-        color: var(--bg-primary);
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: none;
-        border-radius: var(--radius-pill);
+        padding: 14px 32px;
+        background: var(--gradient);
+        color: #fff;
         text-decoration: none;
-        cursor: pointer;
-        transition: var(--transition-med);
-        box-shadow: 0 4px 20px rgba(45,212,191,0.35);
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        transition: var(--transition);
+        box-shadow: 0 10px 20px -5px var(--accent-glow);
     }
-
     .hero-play-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(45,212,191,0.35);
-        color: var(--bg-primary);
+        box-shadow: 0 15px 30px -5px var(--accent-glow);
     }
 
-    /* Carousel Dots */
     .carousel-dots {
+        position: absolute;
+        bottom: var(--space-6);
+        right: var(--space-8);
         display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 16px;
-        position: relative;
-        z-index: 5;
+        gap: var(--space-3);
+        z-index: 10;
     }
-
     .carousel-dot {
-        width: 10px; height: 10px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        border: 2px solid var(--text-muted);
-        background: transparent;
-        cursor: pointer;
-        transition: var(--transition-med);
+        background: rgba(255,255,255,0.2);
+        border: none;
         padding: 0;
+        cursor: pointer;
+        transition: var(--transition);
     }
-
     .carousel-dot.active {
         background: var(--teal);
-        border-color: var(--teal);
-        box-shadow: 0 0 10px rgba(45,212,191,0.5);
-        transform: scale(1.25);
+        transform: scale(1.3);
+        box-shadow: 0 0 10px var(--teal-glow);
     }
 
-    /* ========================================
-       Search Bar
-       ======================================== */
+    /* --- Search & Filters --- */
+    .controls-wrapper {
+        position: sticky;
+        top: calc(var(--ib-height) + 10px);
+        z-index: 100;
+        margin-bottom: var(--space-8);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+    
     .search-container {
-        max-width: 700px;
-        margin: 0 auto 28px;
         position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
     }
-
     .search-input {
         width: 100%;
-        padding: 16px 24px 16px 52px;
-        font-size: 1.05rem;
-        background: var(--bg-card);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-        border: 1px solid var(--border-glass);
-        border-radius: var(--radius-pill);
-        color: var(--text-primary);
-        outline: none;
-        transition: var(--transition-med);
+        padding: 16px 20px 16px 52px;
+        background: var(--glass-bg);
+        border: var(--border);
+        border-radius: var(--radius-lg);
+        color: #fff;
+        font-size: 16px;
+        backdrop-filter: var(--glass-blur);
+        transition: var(--transition);
     }
-
-    .search-input::placeholder { color: var(--text-muted); }
-
     .search-input:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(45,212,191,0.15);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-halo);
+        outline: none;
     }
-
     .search-icon {
         position: absolute;
-        left: 18px;
+        left: 20px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--text-muted);
-        font-size: 1rem;
-        pointer-events: none;
-        transition: color var(--transition-fast);
+        color: var(--text-dim);
+        font-size: 18px;
     }
-
-    .search-input:focus ~ .search-icon { color: var(--teal); }
-
     .search-clear {
         position: absolute;
         right: 16px;
@@ -585,580 +341,357 @@ $user_id = $_SESSION['user_id'];
         transform: translateY(-50%);
         background: none;
         border: none;
-        color: var(--text-muted);
-        font-size: 1rem;
+        color: var(--text-dim);
         cursor: pointer;
-        display: none;
-        padding: 4px;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+    }
+    .search-clear.visible {
+        opacity: 1;
+        visibility: visible;
     }
 
-    .search-clear.visible { display: block; }
-    .search-clear:hover { color: var(--coral); }
-
-    .search-no-results {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--text-muted);
-        font-size: 1.1rem;
-        display: none;
-    }
-
-    .search-no-results i {
-        font-size: 2.5rem;
-        margin-bottom: 16px;
-        display: block;
-        color: var(--text-muted);
-    }
-
-    /* ========================================
-       Category Tabs
-       ======================================== */
     .category-tabs {
         display: flex;
+        gap: var(--space-2);
+        overflow-x: auto;
+        padding: var(--space-2) 0;
+        scrollbar-width: none;
         justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 36px;
-        scrollbar-width: thin;
-        scrollbar-color: var(--teal) transparent;
     }
-
+    .category-tabs::-webkit-scrollbar { display: none; }
+    
     .category-tab {
-        display: inline-flex;
+        padding: 8px 20px;
+        background: var(--bg-elevated);
+        border: var(--border);
+        border-radius: var(--radius-pill);
+        color: var(--text-soft);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: var(--transition);
+        display: flex;
         align-items: center;
         gap: 8px;
-        background: var(--bg-card);
-        color: var(--text-secondary);
-        border: 1px solid var(--border-glass);
-        padding: 10px 22px;
-        border-radius: var(--radius-pill);
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: var(--transition-med);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
     }
-
     .category-tab:hover {
-        background: rgba(255,255,255,0.1);
-        color: var(--text-primary);
-        border-color: var(--border-glass-hover);
-        transform: translateY(-2px);
+        background: var(--glass-bg-hover);
+        border-color: var(--accent);
+        color: #fff;
     }
-
     .category-tab.active {
-        background: var(--grad-teal);
-        color: var(--bg-primary);
-        border-color: transparent;
-        box-shadow: 0 4px 18px rgba(45,212,191,0.35);
-        font-weight: 700;
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 4px 12px var(--accent-glow);
     }
-
-    .category-tab.active:hover {
-        color: var(--bg-primary);
-    }
-
     .tab-count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 22px; height: 22px;
-        padding: 0 6px;
-        border-radius: 11px;
-        font-size: 0.75rem;
-        font-weight: 700;
+        font-size: 11px;
         background: rgba(255,255,255,0.15);
-        color: inherit;
-        line-height: 1;
+        padding: 1px 6px;
+        border-radius: 6px;
+        opacity: 0.8;
     }
 
-    .category-tab.active .tab-count {
-        background: rgba(15,23,42,0.25);
-        color: var(--bg-primary);
-    }
-
-    /* ========================================
-       Games Grid
-       ======================================== */
+    /* --- Games Grid (Bento Style) --- */
     .games-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 24px;
-        margin-bottom: 50px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--grid-gap);
     }
-
-    /* ========================================
-       Game Card
-       ======================================== */
+    
     .game-card {
-        position: relative;
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(78,205,196,0.25);
-        border-radius: 14px;
-        padding: 24px;
-        text-align: center;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        position: relative;
+        background: var(--game-card-bg);
+        border: var(--game-card-border);
+        border-radius: var(--radius-lg);
         overflow: hidden;
-        min-height: 190px;
+        transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out), border-color 0.4s;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        position: relative;
+        backdrop-filter: var(--glass-blur);
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .game-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-        transition: left 0.5s;
-    }
-
-    .game-card:hover::before {
-        left: 100%;
-    }
-
-    .game-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        border-color: rgba(78,205,196,0.5);
-    }
-
     .game-card.visible {
         opacity: 1;
         transform: translateY(0);
     }
-
-    /* Emoji thumbnail background */
+    .game-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: var(--accent-soft);
+        box-shadow: var(--shadow-lg), 0 0 20px var(--accent-halo);
+        z-index: 10;
+    }
+    
     .card-thumb {
-        height: 120px;
+        height: 160px;
+        background: var(--bg-raised);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 3.5rem;
-        background: linear-gradient(135deg, rgba(45,212,191,0.08), rgba(167,139,250,0.08));
         position: relative;
+        font-size: 64px;
         overflow: hidden;
     }
-
+    .card-thumb span {
+        transition: transform 0.5s var(--ease-out);
+        z-index: 2;
+    }
+    .game-card:hover .card-thumb span {
+        transform: scale(1.2) rotate(5deg);
+    }
     .card-thumb::after {
         content: '';
         position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 40px;
-        background: linear-gradient(transparent, var(--bg-card));
-        pointer-events: none;
+        inset: 0;
+        background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s;
     }
+    .game-card:hover .card-thumb::after { opacity: 0.4; }
 
-    /* "NEW!" corner ribbon */
-    .ribbon-new {
+    .popularity, .ribbon-new {
         position: absolute;
-        top: 14px;
-        right: -30px;
-        background: var(--grad-coral);
-        color: #fff;
-        font-size: 0.65rem;
+        z-index: 5;
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
+        font-size: 10px;
         font-weight: 800;
-        letter-spacing: 1px;
         text-transform: uppercase;
-        padding: 4px 36px;
-        transform: rotate(45deg);
-        box-shadow: 0 2px 8px rgba(249,113,113,0.4);
-        z-index: 3;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(8px);
     }
-
-    /* Popularity indicator */
     .popularity {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        background: rgba(15,23,42,0.7);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        padding: 4px 10px;
-        border-radius: var(--radius-pill);
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: var(--gold);
-        z-index: 3;
+        top: 12px;
+        left: 12px;
+        background: rgba(255, 107, 179, 0.2);
+        border: 1px solid rgba(255, 107, 179, 0.3);
+        color: var(--pink);
     }
-
-    .popularity i { font-size: 0.6rem; }
-
-    .card-body {
-        padding: 20px 22px 24px;
-    }
-
-    .card-body h3 {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-        line-height: 1.3;
-    }
-
-    .card-body p {
-        font-size: 0.88rem;
-        color: var(--text-secondary);
-        line-height: 1.55;
-        margin-bottom: 18px;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .card-category-badge {
-        display: inline-block;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        padding: 3px 10px;
-        border-radius: var(--radius-pill);
-        margin-bottom: 12px;
-        background: rgba(45,212,191,0.12);
+    .ribbon-new {
+        top: 12px;
+        right: 12px;
+        background: rgba(29, 255, 196, 0.2);
+        border: 1px solid rgba(29, 255, 196, 0.3);
         color: var(--teal);
     }
 
-    .card-category-badge.action  { background: rgba(249,113,113,0.12); color: var(--coral);  }
-    .card-category-badge.puzzle  { background: rgba(167,139,250,0.12); color: var(--purple); }
-    .card-category-badge.horror  { background: rgba(239,68,68,0.12);  color: #f87171;       }
-    .card-category-badge.strategy{ background: rgba(251,191,36,0.12);  color: var(--gold);   }
-    .card-category-badge.fnaf    { background: rgba(239,68,68,0.12);  color: #f87171;       }
-    .card-category-badge.fix     { background: rgba(16,185,129,0.12); color: #34d399;       }
-    .card-category-badge.broke   { background: rgba(239,68,68,0.15); color: #f87171;       }
-    .card-category-badge.arcade  { background: rgba(56,189,248,0.12); color: #38bdf8;       }
-
-    .game-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 11px 24px;
-        background: var(--grad-teal);
-        color: var(--bg-primary);
+    .card-body {
+        padding: var(--space-5);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .card-category-badge {
+        font-size: 11px;
         font-weight: 700;
-        font-size: 0.88rem;
-        border: none;
-        border-radius: var(--radius-pill);
-        text-decoration: none;
-        cursor: pointer;
-        transition: var(--transition-med);
-        box-shadow: 0 3px 14px rgba(45,212,191,0.25);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--accent-soft);
+        margin-bottom: var(--space-2);
+        display: block;
+    }
+    .card-body h3 {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 var(--space-2);
+        color: #fff;
+    }
+    .card-body p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin: 0 0 var(--space-5);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .game-button {
+        margin-top: auto;
         width: 100%;
+        padding: 12px;
+        background: var(--bg-elevated);
+        border: var(--border);
+        border-radius: var(--radius-md);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+    }
+    .game-card:hover .game-button {
+        background: var(--gradient);
+        border-color: transparent;
+        box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    /* --- Modals & Notification --- */
+    .background-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+        z-index: 10000;
+        backdrop-filter: blur(12px);
+        padding: var(--space-6);
+        align-items: center;
         justify-content: center;
     }
-
-    .game-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(45,212,191,0.4);
-        color: var(--bg-primary);
+    .background-modal-content {
+        background: var(--bg-raised);
+        border: var(--border-violet);
+        border-radius: var(--radius-xl);
+        max-width: 900px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: var(--space-8);
+        position: relative;
     }
 
-    /* ========================================
-       Footer Back Button
-       ======================================== */
+    .background-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-6);
+        padding-bottom: var(--space-4);
+        border-bottom: var(--border);
+    }
+
+    .background-modal-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .background-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 24px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .background-modal-close:hover { color: #fff; }
+
+    .backgrounds-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: var(--space-5);
+    }
+
+    .background-item {
+        background: var(--bg-elevated);
+        border: var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .background-item:hover {
+        border-color: var(--accent);
+        transform: translateY(-4px);
+    }
+    .background-item.active {
+        border-color: var(--teal);
+        box-shadow: 0 0 15px var(--teal-glow);
+    }
+
+    .background-preview {
+        height: 120px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .background-info { padding: var(--space-4); }
+    .background-title { font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .background-designer { font-size: 12px; color: var(--text-dim); }
+
+    .btn-set-background {
+        width: 100%;
+        margin-top: var(--space-3);
+        padding: 8px;
+        background: var(--bg-raised);
+        border: var(--border);
+        border-radius: var(--radius-sm);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .background-item:hover .btn-set-background {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+    
+    /* --- Footer Navigation --- */
     .footer-back {
         text-align: center;
-        margin-top: 20px;
-        padding-bottom: 40px;
+        margin-top: var(--space-10);
     }
-
     .back-button {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        background: var(--grad-purple);
-        color: white;
-        padding: 14px 32px;
+        gap: 12px;
+        padding: 16px 40px;
+        background: var(--bg-elevated);
+        border: var(--border);
         border-radius: var(--radius-pill);
+        color: #fff;
         text-decoration: none;
-        font-weight: 700;
-        transition: var(--transition-med);
-        box-shadow: 0 4px 18px rgba(167,139,250,0.3);
-    }
-
-    .back-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 28px rgba(167,139,250,0.45);
-        color: white;
-    }
-
-    /* ========================================
-       Notification
-       ======================================== */
-    .notification {
-        position: fixed;
-        top: 20px; right: 20px;
-        padding: 1rem 1.5rem;
-        border-radius: var(--radius-sm);
-        background: var(--teal);
-        color: var(--bg-primary);
         font-weight: 600;
-        box-shadow: 0 4px 16px rgba(45,212,191,0.35);
-        z-index: 10001;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
+        transition: var(--transition);
+    }
+    .back-button:hover {
+        background: var(--glass-bg-hover);
+        border-color: var(--accent);
+        transform: translateY(-3px);
+    }
+
+    /* --- Responsive Fixes --- */
+    @media (max-width: 768px) {
+        .hero-carousel { height: 400px; }
+        .hero-card-inner { padding: var(--space-6); }
+        .hero-stats { gap: var(--space-4); }
+        .hero-play-btn { width: 100%; justify-content: center; }
+        .controls-wrapper { top: var(--ib-height); }
+        .category-tabs { justify-content: flex-start; }
+    }
+
+    /* --- Toast Notifications --- */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: var(--radius-lg);
+        background: var(--bg-raised);
+        border: var(--border);
+        color: #fff;
+        font-weight: 600;
+        z-index: 10000;
+        transform: translateX(450px);
+        transition: transform 0.4s var(--ease-out);
+        box-shadow: var(--shadow-xl);
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 12px;
+        backdrop-filter: blur(12px);
     }
-
-    .notification.show { transform: translateX(0); }
-    .notification.error { background: #ef4444; color: #fff; }
-
-    /* ========================================
-       Responsive
-       ======================================== */
-
-    /* Tablet breakpoint: 768px - 1024px */
-    @media (max-width: 1024px) {
-        .games-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .hero-carousel {
-            height: 360px;
-            max-width: 700px;
-        }
-
-        .search-container {
-            max-width: 600px;
-        }
-    }
-
-    /* Mobile breakpoint: up to 768px */
-    @media (max-width: 768px) {
-        .control-buttons-container {
-            position: relative;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: center;
-            top: 0; right: 0;
-            margin-bottom: 20px;
-        }
-
-        .logout-btn, .setting-btn, .backgrounds-btn, .home-btn {
-            font-size: 12px;
-            padding: 10px 15px;
-        }
-
-        .backgrounds-grid { grid-template-columns: 1fr; }
-
-        .page-header h1 { font-size: 2.2rem; }
-
-        .hero-carousel { height: 340px; }
-
-        .hero-card-inner {
-            padding: 24px 18px;
-        }
-
-        .hero-card-inner h2 { font-size: 1.4rem; }
-        .hero-card-inner p  { font-size: 0.9rem; }
-
-        .hero-stats { gap: 18px; flex-wrap: wrap; }
-
-        .hero-play-btn {
-            padding: 12px 28px;
-            font-size: 0.95rem;
-        }
-
-        .games-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        /* Category tabs: horizontal scroll on mobile */
-        .category-tabs {
-            flex-wrap: nowrap;
-            justify-content: flex-start;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            white-space: nowrap;
-            padding-bottom: 8px;
-            gap: 8px;
-        }
-
-        .category-tab {
-            padding: 8px 16px;
-            font-size: 0.82rem;
-            flex-shrink: 0;
-        }
-
-        /* Fix badge overlapping on small screens */
-        .ribbon-new {
-            top: 10px;
-            right: -28px;
-            font-size: 0.6rem;
-            padding: 3px 30px;
-        }
-
-        .popularity {
-            padding: 3px 8px;
-            font-size: 0.65rem;
-        }
-
-        .search-container {
-            max-width: 100%;
-        }
-
-        .search-input {
-            padding: 14px 20px 14px 48px;
-            font-size: 0.95rem;
-        }
-    }
-
-    /* Small phone breakpoint: up to 480px */
-    @media (max-width: 480px) {
-        .page-wrapper { padding: 16px 12px 40px; }
-        .page-header { padding: 30px 16px 26px; }
-        .page-header h1 { font-size: 1.8rem; }
-        .page-header p { font-size: 1rem; }
-
-        .hero-carousel { height: 360px; }
-
-        .hero-card-inner {
-            padding: 20px 14px;
-        }
-
-        .hero-card-inner h2 { font-size: 1.25rem; }
-        .hero-card-inner p { font-size: 0.85rem; margin-bottom: 14px; }
-
-        .hero-stats { gap: 14px; }
-        .hero-stat-val { font-size: 1.1rem; }
-        .hero-stat-lbl { font-size: 0.65rem; }
-
-        .hero-play-btn {
-            padding: 10px 24px;
-            font-size: 0.9rem;
-        }
-
-        .hero-emoji { font-size: 2.5rem; margin-bottom: 8px; }
-
-        .games-grid {
-            grid-template-columns: 1fr;
-            gap: 14px;
-        }
-
-        .card-body {
-            padding: 16px 16px 20px;
-        }
-
-        .card-body h3 { font-size: 1.05rem; }
-        .card-body p { font-size: 0.82rem; }
-
-        /* Fix badge overlapping on very small screens */
-        .ribbon-new {
-            top: 8px;
-            right: -26px;
-            font-size: 0.55rem;
-            padding: 2px 26px;
-        }
-
-        .popularity {
-            top: 8px;
-            left: 8px;
-            padding: 2px 6px;
-            font-size: 0.6rem;
-        }
-
-        .card-thumb {
-            height: 100px;
-            font-size: 2.8rem;
-        }
-
-        .category-tab {
-            padding: 7px 14px;
-            font-size: 0.78rem;
-        }
-
-        .back-link {
-            font-size: 0.85rem;
-            padding: 8px 16px;
-        }
-
-        .back-button {
-            padding: 12px 24px;
-            font-size: 0.9rem;
-        }
-
-        .search-input {
-            padding: 12px 18px 12px 44px;
-            font-size: 0.9rem;
-        }
-
-        .search-icon {
-            left: 14px;
-            font-size: 0.9rem;
-        }
-    }
-
-    /* ========================================
-       Cinematic UI Overhaul
-       ======================================== */
-    .page-header {
-        position: relative;
-        z-index: 2;
-    }
-    .page-header::after {
-        content: '';
-        position: absolute;
-        top: -50%; left: -10%; right: -10%; bottom: -50%;
-        background: radial-gradient(circle at center, rgba(45, 212, 191, 0.12), transparent 70%);
-        z-index: -1;
-        pointer-events: none;
-        animation: pulse-glow 6s ease-in-out infinite alternate;
-    }
-    @keyframes pulse-glow {
-        0% { transform: scale(0.9); opacity: 0.5; }
-        100% { transform: scale(1.1); opacity: 1; }
-    }
-
-    /* Floating animation for hero cards */
-    @keyframes hero-float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
-    }
-
-    .hero-card.active .hero-card-inner {
-        animation: hero-float 5s ease-in-out infinite;
-    }
-
-    /* Layout spacing fixes */
-    .hero-carousel {
-        margin-bottom: 60px !important;
-    }
-    .search-container {
-        margin-bottom: 35px !important;
-        z-index: 10;
-        position: relative;
-    }
-    .category-tabs {
-        margin-bottom: 50px !important;
-        z-index: 5;
-    }
-    .games-grid {
-        padding-top: 10px;
-    }
-
-    /* Enhanced glassmorphism hover — no !important so 3D tilt JS can override */
-    .game-card:hover {
-        border-color: rgba(45, 212, 191, 0.35);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4),
-                    inset 0 1px 0 rgba(255,255,255,0.15),
-                    0 0 30px rgba(45, 212, 191, 0.15);
-    }
+    .toast.visible { transform: translateX(0); }
+    .toast-success { border-color: var(--teal); background: rgba(13, 148, 136, 0.2); }
+    .toast-error { border-color: var(--pink); background: rgba(219, 39, 119, 0.2); }
+    .toast-info { border-color: var(--accent); background: rgba(37, 99, 235, 0.2); }
 
 </style>
 </head>
@@ -1199,6 +732,14 @@ $user_id = $_SESSION['user_id'];
         <header class="page-header">
             <h1><i class="fa-solid fa-gamepad"></i> Game Center</h1>
             <p>Discover our collection of handpicked HTML5 games and interactive experiences</p>
+            <div class="header-actions">
+                <button class="btn-action primary" onclick="openBackgroundModal()">
+                    <i class="fa-solid fa-palette"></i> Choose Background
+                </button>
+                <a href="set.php" class="btn-action">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
+            </div>
         </header>
 
         <!-- Announcements Section -->
@@ -2025,336 +1566,263 @@ $user_id = $_SESSION['user_id'];
             const noRes   = document.getElementById('noResults');
 
             function filterBySearch() {
-                const q = input.value.trim().toLowerCase();
-                clear.classList.toggle('visible', q.length > 0);
+        /**
+         * Game Center Modern Logic v3.0
+         * Handles: Search, Filtering, Category Tabs, Hero Carousel, 3D Tilt, and Background Persistence
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            const state = {
+                activeHero: 0,
+                activeCategory: 'all',
+                searchQuery: '',
+                isFiltering: false
+            };
 
-                const cards = grid.querySelectorAll('.game-card');
+            // DOM Elements
+            const gamesGrid = document.getElementById('gamesGrid');
+            const gameCards = Array.from(document.querySelectorAll('.game-card'));
+            const heroCards = document.querySelectorAll('.hero-card');
+            const carouselDots = document.querySelectorAll('.carousel-dot');
+            const searchInput = document.getElementById('gameSearch');
+            const searchClear = document.getElementById('searchClear');
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const noResults = document.getElementById('noResults');
+            const bgThemeOverride = document.getElementById('bgThemeOverride');
+            const backgroundModal = document.getElementById('backgroundModal');
+            const backgroundsGrid = document.getElementById('backgroundsGrid');
+
+            // --- 1. Category Count Initialization ---
+            const updateCategoryCounts = () => {
+                const counts = { all: 0 };
+                gameCards.forEach(card => {
+                    const cat = card.dataset.category;
+                    if (cat) {
+                        counts[cat] = (counts[cat] || 0) + 1;
+                        counts['all']++;
+                    }
+                });
+
+                Object.keys(counts).forEach(cat => {
+                    const badge = document.getElementById(`count-${cat}`);
+                    if (badge) badge.textContent = counts[cat];
+                });
+            };
+            updateCategoryCounts();
+
+            // --- 2. Search & Filter Logic ---
+            const filterGames = () => {
+                state.isFiltering = true;
                 let visibleCount = 0;
-                const activeTab = document.querySelector('.category-tab.active');
-                const activeCat = activeTab ? activeTab.dataset.category : 'all';
+                const query = state.searchQuery.toLowerCase();
 
-                cards.forEach(card => {
-                    const title = (card.dataset.title || '').toLowerCase();
-                    const cat   = card.dataset.category || '';
-                    const matchSearch = !q || title.includes(q);
-                    const matchCat = activeCat === 'all' || cat === activeCat;
+                gameCards.forEach(card => {
+                    const title = card.dataset.title.toLowerCase();
+                    const category = card.dataset.category;
+                    const matchesSearch = title.includes(query);
+                    const matchesCategory = state.activeCategory === 'all' || category === state.activeCategory;
 
-                    if (matchSearch && matchCat) {
+                    if (matchesSearch && matchesCategory) {
                         card.style.display = '';
+                        setTimeout(() => card.classList.add('visible'), 50);
                         visibleCount++;
                     } else {
                         card.style.display = 'none';
+                        card.classList.remove('visible');
                     }
                 });
 
-                noRes.style.display = visibleCount === 0 ? 'block' : 'none';
-            }
+                noResults.style.display = visibleCount === 0 ? 'flex' : 'none';
+                state.isFiltering = false;
+            };
 
-            input.addEventListener('input', filterBySearch);
-
-            clear.addEventListener('click', function() {
-                input.value = '';
-                clear.classList.remove('visible');
-                filterBySearch();
-                input.focus();
+            searchInput.addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                searchClear.classList.toggle('visible', state.searchQuery.length > 0);
+                filterGames();
             });
 
-            // Expose for category tabs
-            window._filterBySearch = filterBySearch;
-        })();
-
-        // ========================================
-        // Category Tabs with Count Badges
-        // ========================================
-        (function() {
-            const tabs  = document.querySelectorAll('.category-tab');
-            const cards = document.querySelectorAll('.game-card');
-
-            // Populate count badges
-            const counts = {};
-            let total = 0;
-            cards.forEach(card => {
-                const cat = card.dataset.category;
-                if (!cat) return;
-                // Don't count the "More Games Coming" placeholder
-                if (card.dataset.title === 'More Games Coming') return;
-                counts[cat] = (counts[cat] || 0) + 1;
-                total++;
+            searchClear.addEventListener('click', () => {
+                searchInput.value = '';
+                state.searchQuery = '';
+                searchClear.classList.remove('visible');
+                filterGames();
+                searchInput.focus();
             });
 
-            const allCount = document.getElementById('count-all');
-            if (allCount) allCount.textContent = total;
-
-            Object.keys(counts).forEach(cat => {
-                const el = document.getElementById('count-' + cat);
-                if (el) el.textContent = counts[cat];
-            });
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-
-                    // Re-run search filter (which also respects category)
-                    if (window._filterBySearch) window._filterBySearch();
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    state.activeCategory = tab.dataset.category;
+                    filterGames();
                 });
             });
-        })();
 
-        // ========================================
-        // IntersectionObserver Stagger Animation
-        // ========================================
-        (function() {
-            const cards = document.querySelectorAll('.game-card');
-            let delay = 0;
+            // --- 3. Hero Carousel ---
+            let heroInterval;
+            const setHero = (index) => {
+                heroCards.forEach(c => c.classList.remove('active'));
+                carouselDots.forEach(d => d.classList.remove('active'));
+                
+                if (heroCards[index]) heroCards[index].classList.add('active');
+                if (carouselDots[index]) carouselDots[index].classList.add('active');
+                state.activeHero = index;
+            };
 
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
+            carouselDots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    stopHeroRotation();
+                    setHero(idx);
+                    startHeroRotation();
+                });
+            });
+
+            const startHeroRotation = () => {
+                heroInterval = setInterval(() => {
+                    let next = (state.activeHero + 1) % heroCards.length;
+                    setHero(next);
+                }, 8000);
+            };
+
+            const stopHeroRotation = () => clearInterval(heroInterval);
+
+            if (heroCards.length > 0) startHeroRotation();
+
+            // --- 4. 3D Tilt Effect & Staggered Reveal ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, idx) => {
                     if (entry.isIntersecting) {
-                        const card = entry.target;
-                        const stagger = parseInt(card.dataset.stagger || '0');
-                        card.style.transitionDelay = stagger + 'ms';
-                        card.style.transition = 'opacity 0.5s ease ' + stagger + 'ms, transform 0.5s ease ' + stagger + 'ms';
-                        card.classList.add('visible');
-                        observer.unobserve(card);
+                        setTimeout(() => {
+                            entry.target.classList.add('reveal', 'visible');
+                        }, (idx % 8) * 100);
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, {
-                threshold: 0.08,
-                rootMargin: '0px 0px -40px 0px'
-            });
+            }, { threshold: 0.1 });
 
-            cards.forEach(function(card, i) {
-                card.dataset.stagger = (i % 8) * 80; // stagger in groups of 8
+            gameCards.forEach(card => {
                 observer.observe(card);
 
-                // 3D Tilt on hover
-                card.addEventListener('mousemove', function(e) {
-                    var rect = card.getBoundingClientRect();
-                    var x = e.clientX - rect.left;
-                    var y = e.clientY - rect.top;
-                    var centerX = rect.width / 2;
-                    var centerY = rect.height / 2;
-                    var rotateX = ((y - centerY) / centerY) * -8;
-                    var rotateY = ((x - centerX) / centerX) * 8;
-                    card.style.transitionDuration = '0.1s';
-                    card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02, 1.02, 1.02)';
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -10;
+                    const rotateY = ((x - centerX) / centerX) * 10;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
                 });
 
-                card.addEventListener('mouseleave', function() {
-                    card.style.transitionDuration = '0.5s';
-                    card.style.transform = '';
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
                 });
             });
-        })();
 
-        // ========================================
-        // Logout
-        // ========================================
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                const logoutBtn = document.querySelector('.logout-btn');
-                const originalText = logoutBtn.innerHTML;
-                logoutBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging out...';
-                logoutBtn.disabled = true;
+            // --- 5. Background System & Notifications ---
+            const showNotification = (msg, type = 'success') => {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed; top: 20px; right: 20px;
+                    background: ${type === 'success' ? 'linear-gradient(135deg, #2dd4bf, #06b6d4)' : 'linear-gradient(135deg, #f87171, #ef4444)'};
+                    color: #0f172a; padding: 15px 25px; border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000;
+                    font-weight: 700; transform: translateX(450px);
+                    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    display: flex; align-items: center; gap: 10px;
+                `;
+                toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${msg}`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(450px)';
+                    setTimeout(() => toast.remove(), 400);
+                }, 4000);
+            };
 
-                fetch('auth/logout.php')
-                    .then(response => {
-                        if (response.ok) {
-                            logoutBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
-                            setTimeout(() => { window.location.href = 'index.php'; }, 1000);
-                        } else {
-                            throw new Error('Logout failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Logout error:', error);
-                        logoutBtn.innerHTML = originalText;
-                        logoutBtn.disabled = false;
-                        alert('Logout failed. Please try again.');
+            window.openBackgroundModal = () => {
+                const backgrounds = JSON.parse(document.body.dataset.backgrounds || '[]');
+                backgroundsGrid.innerHTML = backgrounds.map(bg => `
+                    <div class="background-option" onclick="setAsBackground('${bg.image_url}', '${bg.title.replace(/'/g, "\\'")}')">
+                        <img src="${bg.image_url}" alt="${bg.title}" loading="lazy">
+                        <div class="option-overlay">
+                            <span>${bg.title}</span>
+                        </div>
+                    </div>
+                `).join('');
+                backgroundModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.closeBackgroundModal = () => {
+                backgroundModal.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+
+            window.setAsBackground = async (url, title) => {
+                try {
+                    const response = await fetch('api/set_background.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ background_url: url, title: title })
                     });
-            }
-        }
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        bgThemeOverride.style.backgroundImage = `url(${url})`;
+                        bgThemeOverride.style.opacity = '1';
+                        showNotification(`Background updated to "${title}"`);
+                        closeBackgroundModal();
+                    } else {
+                        showNotification(data.error || 'Failed to update background', 'error');
+                    }
+                } catch (err) {
+                    showNotification('Network connection error', 'error');
+                }
+            };
 
-        // ========================================
-        // Background Selection Functionality
-        // ========================================
-        function openBackgroundModal() {
-            const modal = document.getElementById('backgroundModal');
-            const grid = document.getElementById('backgroundsGrid');
-            grid.innerHTML = '';
+            window.removeCustomBackground = async () => {
+                try {
+                    const response = await fetch('api/set_background.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ remove: true })
+                    });
 
-            const backgrounds = <?php echo json_encode($available_backgrounds); ?>;
-            const currentBackground = getCurrentBackground();
+                    const data = await response.json();
+                    if (data.success) {
+                        bgThemeOverride.style.backgroundImage = '';
+                        bgThemeOverride.style.opacity = '0';
+                        showNotification('Custom background removed');
+                        closeBackgroundModal();
+                    }
+                } catch (err) {
+                    showNotification('Error removing background', 'error');
+                }
+            };
 
-            backgrounds.forEach(background => {
-                const isActive = currentBackground === background.image_url;
+            window.comingSoon = () => {
+                showNotification('This experience is coming soon!', 'success');
+            };
 
-                const backgroundItem = document.createElement('div');
-                backgroundItem.className = 'background-item' + (isActive ? ' active' : '');
-                backgroundItem.innerHTML =
-                    '<div class="background-preview" style="background-image: url(\'' + background.image_url + '\')"></div>' +
-                    '<div class="background-info">' +
-                        '<div class="background-title">' + escapeHtml(background.title) + '</div>' +
-                        '<div class="background-designer">By: ' + escapeHtml(background.designer_name) + '</div>' +
-                        '<div class="background-actions">' +
-                            '<button class="btn-set-background" onclick="setAsBackground(\'' + background.image_url + '\', \'' + escapeHtml(background.title) + '\')">' +
-                                (isActive ? '<i class="fa-solid fa-check"></i> Using' : 'Use This') +
-                            '</button>' +
-                        '</div>' +
-                    '</div>';
-
-                grid.appendChild(backgroundItem);
+            // Global Esc listener
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeBackgroundModal();
             });
 
-            modal.style.display = 'block';
-        }
-
-        function closeBackgroundModal() {
-            document.getElementById('backgroundModal').style.display = 'none';
-        }
-
-        function setAsBackground(imageUrl, title) {
-            let settings = JSON.parse(localStorage.getItem('spencerWebsiteSettings') || '{}');
-            settings.customBackground = imageUrl;
-            settings.customBackgroundTitle = title;
-            localStorage.setItem('spencerWebsiteSettings', JSON.stringify(settings));
-
-            applyActiveBackground();
-            closeBackgroundModal();
-            showNotification('Background set to "' + title + '"!');
-            setTimeout(openBackgroundModal, 100);
-        }
-
-        function removeCustomBackground() {
-            let settings = JSON.parse(localStorage.getItem('spencerWebsiteSettings') || '{}');
-            delete settings.customBackground;
-            delete settings.customBackgroundTitle;
-            localStorage.setItem('spencerWebsiteSettings', JSON.stringify(settings));
-
-            applyActiveBackground();
-            closeBackgroundModal();
-            showNotification('Custom background removed!');
-            setTimeout(openBackgroundModal, 100);
-        }
-
-        function getCurrentBackground() {
-            const savedSettings = localStorage.getItem('spencerWebsiteSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                return settings.customBackground || null;
+            // Init active background
+            const initialBg = document.body.dataset.activeBackground;
+            if (initialBg) {
+                bgThemeOverride.style.backgroundImage = `url(${initialBg})`;
+                bgThemeOverride.style.opacity = '1';
             }
-            return null;
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText =
-                'position:fixed;top:20px;right:20px;' +
-                'background:linear-gradient(135deg,#2dd4bf,#06b6d4);' +
-                'color:#0f172a;padding:15px 20px;border-radius:8px;' +
-                'box-shadow:0 5px 15px rgba(0,0,0,0.3);z-index:10001;' +
-                'font-weight:600;transform:translateX(400px);transition:transform 0.3s ease;';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(function() { notification.style.transform = 'translateX(0)'; }, 100);
-            setTimeout(function() {
-                notification.style.transform = 'translateX(400px)';
-                setTimeout(function() { document.body.removeChild(notification); }, 300);
-            }, 3000);
-        }
-
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // ========================================
-        // Apply Active Background
-        // ========================================
-        function applyActiveBackground() {
-            const bgOverride = document.getElementById('bgThemeOverride');
-            if (!bgOverride) return;
-
-            const savedSettings = localStorage.getItem('spencerWebsiteSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                if (settings.customBackground && settings.customBackground.trim() !== '') {
-                    bgOverride.style.backgroundImage = "url('" + settings.customBackground + "')";
-                    bgOverride.classList.remove('designer-bg');
-                    return;
-                }
-            }
-
-            <?php if ($active_designer_background): ?>
-                bgOverride.style.backgroundImage = "url('<?php echo htmlspecialchars($active_designer_background['image_url'], ENT_QUOTES); ?>')";
-                bgOverride.classList.add('designer-bg');
-            <?php endif; ?>
-        }
-
-        // ========================================
-        // DOMContentLoaded - Settings & Init
-        // ========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedSettings = localStorage.getItem('spencerWebsiteSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-
-                if (settings.accentColor) {
-                    const accentColor = '#' + settings.accentColor;
-
-                    let styleElement = document.getElementById('accent-color-styles');
-                    if (!styleElement) {
-                        styleElement = document.createElement('style');
-                        styleElement.id = 'accent-color-styles';
-                        document.head.appendChild(styleElement);
-                    }
-
-                    styleElement.textContent =
-                        '.game-button, .move-button, .info-button { background: linear-gradient(135deg, ' + accentColor + ', #06b6d4) !important; }' +
-                        '.game-button:hover, .move-button:hover, .info-button:hover { background: linear-gradient(135deg, #06b6d4, ' + accentColor + ') !important; }' +
-                        '.back-link { border-color: ' + accentColor + ' !important; }' +
-                        '.back-link:hover { border-color: ' + accentColor + ' !important; color: ' + accentColor + ' !important; }' +
-                        '.back-button { background: linear-gradient(135deg, ' + accentColor + ', #7c3aed) !important; }' +
-                        '.game-card:hover { border-color: rgba(255,255,255,0.2) !important; }' +
-                        '.page-header h1 { background: linear-gradient(135deg, ' + accentColor + ', #a78bfa, #f97171) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; }' +
-                        '.page-header::before { background: linear-gradient(135deg, ' + accentColor + ', #a78bfa, #f97171) !important; }' +
-                        '.category-tab.active { background: linear-gradient(135deg, ' + accentColor + ', #06b6d4) !important; }' +
-                        '.hero-play-btn { background: linear-gradient(135deg, ' + accentColor + ', #06b6d4) !important; }';
-                }
-
-                if (settings.fontSize) {
-                    document.documentElement.style.fontSize = settings.fontSize + 'px';
-                }
-
-                if (settings.gameVolume) {
-                    console.log('Game volume set to:', settings.gameVolume);
-                }
-            }
-
-            applyActiveBackground();
-        });
-
-        function comingSoon() {
-            alert('More exciting games are coming soon! Stay tuned for updates.');
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('backgroundModal');
-            if (event.target === modal) { closeBackgroundModal(); }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'l') { e.preventDefault(); logout(); }
-            if (e.ctrlKey && e.key === 's') { e.preventDefault(); window.location.href = 'set.php'; }
-            if (e.ctrlKey && e.key === 'b') { e.preventDefault(); openBackgroundModal(); }
         });
     </script>
 
