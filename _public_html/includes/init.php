@@ -482,14 +482,14 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_
                             }
                         }
                     }
+                } catch (Exception $e) {
+                    // Silently fail - don't break the site if check fails
+                    error_log("Force logout check error: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                // Silently fail - don't break the site if check fails
-                error_log("Force logout check error: " . $e->getMessage());
             }
         }
     }
-}
+
 
 // --- Lazy Subscription Status Check (every 15 min) ---
 // Only for 'user' role — skip community, contributor, designer, admin
